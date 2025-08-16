@@ -1,237 +1,383 @@
-/baguet
- ├── index.html      → Inicio
- ├── publicar.html   → Página para publicar productos
- ├── listado.html    → Página donde se listan los productos
- └── style.css       → Estilos compartidos
- └── script.js       → Lógica de publicar y mostrar productos
- └── img/logo.png    → Logo de Baguet
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Baguet - Inicio</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Baguet Loja – Plataforma de ventas local</title>
+<meta name="description" content="Baguet Loja: publica y vende productos locales fácilmente. Simple, rápido y pensado para familias.">
+<style>
+  :root{
+    /* Paleta tipo SaaS (inspirada): */
+    --bg:#0b0f14;
+    --ink:#0f1720;
+    --text:#0f1720;
+    --muted:#6b7280;
+
+    --brand-1:#6d28d9; /* violeta */
+    --brand-2:#2563eb; /* azul */
+    --brand-3:#10b981; /* acento verde */
+
+    --surface:#ffffff;
+    --surface-2:#f6f7fb;
+
+    --nav-bg:#0c1320;
+    --hero-grad: linear-gradient(135deg, rgba(37,99,235,.18), rgba(109,40,217,.22));
+
+    --radius: 14px;
+    --shadow: 0 2px 8px rgba(16,24,40,.06), 0 12px 30px rgba(2,6,23,.12);
+    --shadow-soft: 0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color:#0f1720;
+    background: #f5f7fb;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* NAV */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    background:var(--nav-bg);
+    color:#e5eef7;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .nav-inner{
+    max-width:1120px; margin:auto; padding:14px 16px;
+    display:grid; grid-template-columns:auto 1fr auto; gap:16px; align-items:center;
+  }
+  .brand{display:flex;gap:10px;align-items:center}
+  .brand img{width:36px;height:36px;border-radius:8px;object-fit:cover;background:#fff}
+  .brand .title{line-height:1.05}
+  .brand .title b{display:block; font-size:16px; letter-spacing:.3px}
+  .brand .title span{font-size:11px; opacity:.8; letter-spacing:1px}
+  .nav a{
+    color:#cfe3ff; text-decoration:none; font-weight:600; font-size:14px; margin:0 10px;
+  }
+  .nav a:hover{color:#fff}
+  .nav-cta{
+    display:flex; gap:10px;
+  }
+  .btn{
+    appearance:none; border:0; cursor:pointer; font-weight:700; border-radius:10px;
+    padding:10px 14px; font-size:14px;
+  }
+  .btn-outline{ background:transparent; color:#e5eef7; border:1px solid rgba(255,255,255,.2); }
+  .btn-outline:hover{ border-color:#fff; }
+  .btn-primary{
+    background: linear-gradient(180deg, var(--brand-2), var(--brand-1));
+    color:#fff; box-shadow: var(--shadow);
+  }
+  .btn-primary:hover{ filter: brightness(1.05); }
+
+  /* HERO */
+  .hero{
+    background: var(--hero-grad);
+    border-bottom:1px solid #e8ebf3;
+  }
+  .hero-inner{
+    max-width:1120px; margin:0 auto; padding:48px 16px 26px;
+    display:grid; grid-template-columns: 1.15fr .85fr; gap:32px; align-items:center;
+  }
+  @media (max-width:980px){ .hero-inner{grid-template-columns:1fr} }
+  .kicker{
+    display:inline-flex; gap:8px; align-items:center;
+    padding:6px 10px; border-radius:999px; background:#eef5ff; color:#1f2937; font-size:12px; font-weight:700;
+    border:1px solid #d7e7ff;
+  }
+  .hero h1{
+    font-size:38px; line-height:1.1; margin:14px 0 10px;
+    letter-spacing:-.5px; color:#0b1220;
+  }
+  .hero p{ color:#334155; font-size:16px; margin:0 0 16px }
+  .hero-ctas{ display:flex; gap:10px; flex-wrap:wrap }
+  .hero-card{
+    background:#fff; border:1px solid #e7e9f1; border-radius:var(--radius); box-shadow:var(--shadow-soft);
+    padding:16px;
+  }
+  .hero-card h4{ margin:0 0 8px; font-size:14px; color:#334155 }
+  .hero-card ul{ margin:0; padding-left:18px; color:#475569; font-size:14px }
+  .hero-card li{ margin:6px 0 }
+
+  /* CONTAINER */
+  .container{max-width:1120px; margin:28px auto; padding:0 16px;}
+
+  /* BENEFICIOS */
+  .features{
+    display:grid; gap:16px; grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+  @media (max-width:980px){ .features{grid-template-columns:1fr 1fr} }
+  @media (max-width:640px){ .features{grid-template-columns:1fr} }
+  .feature{
+    background:#fff; border:1px solid #e8ebf3; border-radius:var(--radius); box-shadow:var(--shadow-soft);
+    padding:16px;
+  }
+  .feature h3{ margin:0 0 6px; font-size:16px }
+  .feature p{ margin:0; color:#64748b; font-size:14px }
+
+  /* FORM + LIST */
+  .surface{
+    background:#fff; border:1px solid #e8ebf3; border-radius:var(--radius); box-shadow:var(--shadow-soft);
+  }
+  form.surface{ padding:18px; }
+  .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+  @media (max-width:720px){ .grid-2{ grid-template-columns: 1fr; } }
+
+  label{ display:block; font-size:13px; color:#475569; margin: 2px 0 6px; }
+  input[type="text"], input[type="number"], input[type="tel"], textarea{
+    width:100%; padding:12px 12px; border:1px solid #cfd5e1; border-radius:10px;
+    background:#fff; outline:none; font-size:14px; transition:border-color .18s, box-shadow .18s;
+  }
+  input:focus, textarea:focus{ border-color:#9ac5ff; box-shadow: 0 0 0 3px rgba(37,99,235,.16); }
+  textarea{ resize:vertical; min-height:84px; }
+
+  .file-row{ display:grid; grid-template-columns: 1fr 180px; gap:14px; align-items:center; }
+  @media (max-width:720px){ .file-row{ grid-template-columns: 1fr; } }
+  .preview{
+    width:100%; height:170px; border:1px dashed #cfd5e1; border-radius:10px;
+    background: repeating-linear-gradient(45deg,#fafafa,#fafafa 10px,#f3f4f5 10px,#f3f4f5 20px);
+    display:flex; align-items:center; justify-content:center; color:#6b7280; font-size:12px;
+    overflow:hidden;
+  }
+  .preview img{ width:100%; height:100%; object-fit:cover; display:none; }
+
+  .list-header{ display:flex; align-items:center; gap:8px; margin: 24px 0 12px; }
+  .badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:22px; height:22px; padding:0 6px; font-size:12px; font-weight:700;
+    border-radius:999px; color:#033; background:#d5efe9; border:1px solid #b6e0d6;
+  }
+
+  .grid-cards{ display:grid; gap:16px; grid-template-columns: repeat(3, minmax(0,1fr)); }
+  @media (max-width:980px){ .grid-cards{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width:640px){ .grid-cards{ grid-template-columns: 1fr; } }
+
+  .card{
+    background:#fff; border:1px solid #e8ebf3; border-radius:var(--radius); box-shadow:var(--shadow-soft);
+    overflow:hidden;
+  }
+  .card img{ width:100%; height:180px; object-fit:cover; display:block; }
+  .card .body{ padding:14px; }
+  .card h3{ margin:0 0 6px 0; font-size:16px }
+  .muted{ color:#6b7280; font-size:13px }
+  .price{ font-weight:800; margin:6px 0; color:#0f1720 }
+  .cta{ display:flex; gap:8px; margin-top:10px }
+  .link-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    padding:9px 12px; border-radius:10px; text-decoration:none; font-weight:700; font-size:13px;
+    border:1px solid #c9cccf; color:#0a0b0c; background:#fff;
+  }
+  .link-btn:hover{ border-color:#9aa0a6 }
+
+  /* FOOTER */
+  footer{
+    margin-top:40px; background:#0e1626; color:#cdd7e6; padding:22px 16px; text-align:center;
+    border-top:1px solid rgba(255,255,255,.06);
+  }
+  .footer-inner{ max-width:1120px; margin:auto; }
+  .tiny{ font-size:12px; color:#9fb1cc }
+</style>
 </head>
 <body>
-  <header>
-    <img src="img/logo.png" alt="Baguet Logo" class="logo">
-    <nav>
-      <a href="index.html">Inicio</a>
-      <a href="publicar.html">Publicar</a>
-      <a href="listado.html">Listado</a>
-    </nav>
-  </header>
 
-  <section class="hero">
-    <h1>Bienvenido a Baguet Loja</h1>
-    <p>Tu plataforma para publicar y encontrar productos locales fácilmente.</p>
-    <a href="publicar.html" class="btn">Publicar ahora</a>
-  </section>
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <img src="logo-baguet.png" alt="Baguet Loja">
+      <div class="title">
+        <b>BAGUET</b>
+        <span>LOJA</span>
+      </div>
+    </div>
+    <div></div>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="#listado">Ver listado</a>
+      <a class="btn btn-primary" href="#publicar">Publicar</a>
+    </div>
+  </div>
+</div>
 
-  <footer>
-    <p>© 2025 Baguet — Hecho para familias ecuatorianas</p>
-  </footer>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Publicar - Baguet</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <img src="img/logo.png" alt="Baguet Logo" class="logo">
-    <nav>
-      <a href="index.html">Inicio</a>
-      <a href="publicar.html">Publicar</a>
-      <a href="listado.html">Listado</a>
-    </nav>
-  </header>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="kicker">Vende fácil • Sin complicaciones</span>
+      <h1>Tu <span style="background:linear-gradient(90deg, var(--brand-2), var(--brand-1)); -webkit-background-clip:text; background-clip:text; color:transparent;">plataforma de ventas</span> para el barrio</h1>
+      <p>Publica tus productos, comparte por WhatsApp y recibe pedidos en minutos. Sencillo para todos, rápido en celulares básicos.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#publicar">Comenzar ahora</a>
+        <a class="btn" style="background:#f0f5ff; color:#0f1720; border:1px solid #d7e7ff" href="#listado">Ver productos</a>
+      </div>
+    </div>
+    <div class="hero-card">
+      <h4>¿Qué puedes hacer con Baguet?</h4>
+      <ul>
+        <li>Publicar productos con foto desde tu celular</li>
+        <li>Compartir tu publicación por WhatsApp</li>
+        <li>Recibir llamadas y mensajes directo</li>
+        <li>Guardar todo en tu teléfono (sin cuentas)</li>
+      </ul>
+    </div>
+  </div>
+</section>
 
-  <main class="container">
-    <h2>Publicar un producto</h2>
-    <form id="formProducto">
-      <input type="text" placeholder="Nombre del producto" id="nombre" required>
-      <input type="number" placeholder="Precio (USD)" id="precio" required>
-      <input type="text" placeholder="Nombre del vendedor" id="vendedor" required>
-      <input type="text" placeholder="Teléfono (WhatsApp)" id="telefono" required>
-      <textarea placeholder="Descripción" id="descripcion"></textarea>
-      
-      <label>Imagen del producto</label>
-      <input type="file" id="imagen" accept="image/*">
-      <img id="vistaPrevia" class="preview" alt="Vista previa">
+<!-- BENEFICIOS -->
+<section class="container">
+  <div class="features">
+    <article class="feature">
+      <h3>Rápido de usar</h3>
+      <p>Formulario corto, sin registros largos ni contraseñas.</p>
+    </article>
+    <article class="feature">
+      <h3>A prueba de datos</h3>
+      <p>Funciona con conexiones lentas y guarda localmente.</p>
+    </article>
+    <article class="feature">
+      <h3>Contacto directo</h3>
+      <p>Botones de WhatsApp y llamada para cerrar ventas.</p>
+    </article>
+  </div>
+</section>
 
-      <button type="submit" class="btn">Publicar</button>
-    </form>
-  </main>
+<!-- PUBLICAR -->
+<main class="container">
+  <h2 id="publicar" style="margin-bottom:10px">Publicar un producto</h2>
+  <form id="productForm" class="surface" autocomplete="off">
+    <div class="grid-2">
+      <div>
+        <label>Nombre del producto</label>
+        <input id="nombreProducto" type="text" required placeholder="Ej. Pan artesanal" />
+      </div>
+      <div>
+        <label>Precio (USD)</label>
+        <input id="precioProducto" type="number" step="0.01" min="0" required placeholder="Ej. 1.50" />
+      </div>
+      <div>
+        <label>Nombre del vendedor</label>
+        <input id="nombreVendedor" type="text" required placeholder="Tu nombre" />
+      </div>
+      <div>
+        <label>Teléfono (WhatsApp)</label>
+        <input id="telefono" type="tel" placeholder="+593..." />
+      </div>
+    </div>
 
-  <footer>
-    <p>© 2025 Baguet — Hecho para familias ecuatorianas</p>
-  </footer>
+    <div style="margin-top:10px">
+      <label>Descripción</label>
+      <textarea id="descripcionProducto" rows="3" placeholder="Horario, punto de entrega, si aceptas trueque, etc."></textarea>
+    </div>
 
-  <script src="script.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Listado - Baguet</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <img src="img/logo.png" alt="Baguet Logo" class="logo">
-    <nav>
-      <a href="index.html">Inicio</a>
-      <a href="publicar.html">Publicar</a>
-      <a href="listado.html">Listado</a>
-    </nav>
-  </header>
+    <div class="file-row" style="margin-top:10px">
+      <div>
+        <label>Imagen (opcional)</label>
+        <input id="imagen" type="file" accept="image/*" />
+        <div class="muted" style="margin-top:6px">Se guarda localmente en este dispositivo.</div>
+      </div>
+      <div class="preview" id="previewBox">
+        <span>Vista previa</span>
+        <img id="previewImg" alt="Vista previa"/>
+      </div>
+    </div>
 
-  <main class="container">
-    <h2>Productos publicados</h2>
-    <div id="productos"></div>
-  </main>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="btn btn-primary" type="submit">Publicar</button>
+      <span id="status" class="muted"></span>
+    </div>
+  </form>
 
-  <footer>
-    <p>© 2025 Baguet — Hecho para familias ecuatorianas</p>
-  </footer>
+  <div class="list-header">
+    <h2 id="listado" style="margin:0">Productos publicados</h2>
+    <span class="badge" id="count">0</span>
+  </div>
 
-  <script src="script.js"></script>
-</body>
-</html>
-body {
-  font-family: Arial, sans-serif;
-  background: #f8fafc;
-  margin: 0;
-  padding: 0;
-  color: #333;
-}
+  <section id="productos" class="grid-cards"></section>
+</main>
 
-header {
-  background: #ff9800;
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="tiny">© 2025 Baguet — Hecho para familias ecuatorianas • Diseño inspirado en landing SaaS</div>
+  </div>
+</footer>
 
-.logo {
-  height: 40px;
-}
+<script>
+  /* Estado local */
+  const LS_KEY = "baguet_landing_saas";
+  const form = document.getElementById("productForm");
+  const statusEl = document.getElementById("status");
+  const grid = document.getElementById("productos");
+  const countEl = document.getElementById("count");
+  const fileInput = document.getElementById("imagen");
+  const previewBox = document.getElementById("previewBox");
+  const previewImg = document.getElementById("previewImg");
+  let imageDataURL = "";
 
-nav a {
-  margin: 0 10px;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-}
+  function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch{ return []; } }
+  function saveLocal(item){ const data=loadLocal(); data.unshift(item); localStorage.setItem(LS_KEY, JSON.stringify(data)); return data; }
 
-.hero {
-  text-align: center;
-  padding: 50px;
-  background: #fff3e0;
-}
-
-.btn {
-  background: #ff9800;
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  border: none;
-  border-radius: 5px;
-}
-
-.container {
-  max-width: 800px;
-  margin: 30px auto;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-input, textarea {
-  display: block;
-  width: 100%;
-  margin-bottom: 15px;
-  padding: 10px;
-}
-
-.preview {
-  max-width: 150px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-}
-
-footer {
-  text-align: center;
-  background: #ff9800;
-  color: white;
-  padding: 10px;
-  margin-top: 20px;
-}
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("formProducto");
-  const listaProductos = document.getElementById("productos");
-  const inputImagen = document.getElementById("imagen");
-  const vistaPrevia = document.getElementById("vistaPrevia");
-
-  // Mostrar vista previa de imagen
-  if (inputImagen) {
-    inputImagen.addEventListener("change", () => {
-      const file = inputImagen.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          vistaPrevia.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
+  function render(list){
+    grid.innerHTML=""; countEl.textContent=list.length;
+    list.forEach(p=>{
+      const tel=(p.telefono||"").replace(/[^0-9+]/g,'');
+      const wsp= tel ? `https://wa.me/${tel}?text=${encodeURIComponent("Hola, me interesa tu producto: "+p.producto)}` : null;
+      const el=document.createElement("article");
+      el.className="card";
+      el.innerHTML = `
+        ${p.image ? `<img src="${p.image}" alt="${p.producto}">` : ""}
+        <div class="body">
+          <h3>${p.producto}</h3>
+          <div class="muted">Vendedor: ${p.vendedor || "Anónimo"}</div>
+          <div class="price">$${Number(p.precio).toFixed(2)}</div>
+          ${p.descripcion ? `<p class="muted" style="margin:6px 0 0">${p.descripcion}</p>` : ""}
+          <div class="cta">
+            ${wsp ? `<a class="link-btn" target="_blank" href="${wsp}">WhatsApp</a>` : ""}
+            ${tel ? `<a class="link-btn" href="tel:${tel}">Llamar</a>` : ""}
+          </div>
+        </div>`;
+      grid.appendChild(el);
     });
   }
 
-  // Guardar producto
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
+  // Carga inicial
+  render(loadLocal());
 
-      const producto = {
-        nombre: document.getElementById("nombre").value,
-        precio: document.getElementById("precio").value,
-        vendedor: document.getElementById("vendedor").value,
-        telefono: document.getElementById("telefono").value,
-        descripcion: document.getElementById("descripcion").value,
-        imagen: vistaPrevia.src || ""
-      };
+  // Vista previa de imagen
+  fileInput.addEventListener("change", ()=>{
+    const file=fileInput.files?.[0];
+    if(!file){ imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display=""; return; }
+    const reader=new FileReader();
+    reader.onload=e=>{
+      imageDataURL=e.target.result;
+      previewImg.src=imageDataURL;
+      previewImg.style.display="block";
+      previewBox.firstElementChild.style.display="none";
+    };
+    reader.readAsDataURL(file);
+  });
 
-      let productos = JSON.parse(localStorage.getItem("productos")) || [];
-      productos.push(producto);
-      localStorage.setItem("productos", JSON.stringify(productos));
-
-      alert("Producto publicado con éxito!");
-      form.reset();
-      vistaPrevia.src = "";
-    });
-  }
-
-  // Mostrar productos en listado
-  if (listaProductos) {
-    const productos = JSON.parse(localStorage.getItem("productos")) || [];
-    productos.forEach(p => {
-      const div = document.createElement("div");
-      div.classList.add("producto");
-      div.innerHTML = `
-        <h3>${p.nombre} - $${p.precio}</h3>
-        <p><b>Vendedor:</b> ${p.vendedor}</p>
-        <p><b>Teléfono:</b> ${p.telefono}</p>
-        <p>${p.descripcion}</p>
-        ${p.imagen ? `<img src="${p.imagen}" class="preview">` : ""}
-        <hr>
-      `;
-      listaProductos.appendChild(div);
-    });
-  }
-});
+  // Publicar
+  form.addEventListener("submit",(e)=>{
+    e.preventDefault();
+    const pub={
+      producto:document.getElementById("nombreProducto").value.trim(),
+      precio:document.getElementById("precioProducto").value.trim(),
+      vendedor:document.getElementById("nombreVendedor").value.trim(),
+      telefono:document.getElementById("telefono").value.trim(),
+      descripcion:document.getElementById("descripcionProducto").value.trim(),
+      image:imageDataURL
+    };
+    if(!pub.producto || !pub.precio || !pub.vendedor){
+      statusEl.textContent="Completa producto, precio y vendedor."; return;
+    }
+    const list=saveLocal(pub);
+    render(list);
+    form.reset(); imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display="";
+    statusEl.textContent="Publicado (guardado en este dispositivo).";
+  });
+</script>
+</body>
+</html>
