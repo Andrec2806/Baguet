@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Baguet Loja</title>
+<style>
+  /* —— Paleta y base (inspirada en Shopify) —— */
+  :root{
+    --shop-dark: #004c3f;     /* header/nav */
+    --shop-green:#008060;     /* botones/acentos */
+    --shop-green-2:#03624e;   /* hover btn */
+    --shop-ink:#111213;       /* texto principal */
+    --shop-subtle:#6d7175;    /* texto secundario */
+    --shop-bg:#f6f6f7;        /* fondo suave */
+    --shop-surface:#ffffff;   /* tarjetas / formularios */
+    --radius: 12px;
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color:var(--shop-ink);
+    background:var(--shop-bg);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  /* —— Header tipo Shopify —— */
+  header{
+    background: var(--shop-dark);
+    color:#fff;
+    padding: 24px 16px;
+  }
+  .header-inner{
+    max-width: 1040px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: center;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .brand img{
+    width:40px; height:40px; object-fit:cover; border-radius:8px; background:#fff;
+  }
+  .brand .title{
+    line-height:1.1;
+  }
+  .brand .title strong{
+    display:block; font-size:18px; letter-spacing:.4px;
+  }
+  .brand .title span{
+    font-size:12px; opacity:.85; letter-spacing:1px;
+  }
+  nav{
+    display:flex; justify-content:flex-end; gap:16px; flex-wrap:wrap;
+  }
+  nav a{
+    color:#dfe5e2; text-decoration:none; font-weight:600; font-size:14px;
+    padding:8px 10px; border-radius:8px;
+  }
+  nav a:hover{ background: rgba(255,255,255,.08); color:#fff; }
+
+  /* —— Contenedor principal —— */
+  .container{ max-width:1040px; margin: 28px auto; padding: 0 16px; }
+
+  /* —— Secciones —— */
+  h2{ font-size:22px; margin: 0 0 14px 0; }
+  .surface{
+    background:var(--shop-surface);
+    border:1px solid #e1e3e5;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  /* —— Formulario —— */
+  form.surface{ padding:18px; }
+  .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+  @media (max-width:720px){ .grid-2{ grid-template-columns: 1fr; } }
+
+  label{ display:block; font-size:13px; color:var(--shop-subtle); margin: 2px 0 6px; }
+  input[type="text"], input[type="number"], input[type="tel"], textarea{
+    width:100%; padding:10px 12px; border:1px solid #c9cccf; border-radius:10px;
+    background:#fff; outline:none; font-size:14px;
+    transition:border-color .2s, box-shadow .2s, background .2s;
+  }
+  input:focus, textarea:focus{
+    border-color:#9ad8ca; box-shadow: 0 0 0 3px rgba(0,128,96,.18);
+  }
+  textarea{ resize:vertical; min-height:84px; }
+
+  .file-row{ display:grid; grid-template-columns: 1fr 160px; gap:14px; align-items:center; }
+  @media (max-width:720px){ .file-row{ grid-template-columns: 1fr; } }
+
+  .preview{
+    width:100%; height:160px; border:1px dashed #c9cccf; border-radius:10px;
+    background: repeating-linear-gradient(45deg,#fafafa,#fafafa 10px,#f3f4f5 10px,#f3f4f5 20px);
+    display:flex; align-items:center; justify-content:center; color:var(--shop-subtle); font-size:12px;
+    overflow:hidden;
+  }
+  .preview img{ width:100%; height:100%; object-fit:cover; display:none; }
+
+  .actions{ display:flex; gap:10px; margin-top:10px; }
+  .btn{
+    appearance:none; border:0; border-radius:10px; padding:10px 14px; cursor:pointer;
+    font-weight:700; font-size:14px;
+  }
+  .btn-primary{ background:var(--shop-green); color:#fff; }
+  .btn-primary:hover{ background:var(--shop-green-2); }
+  .meta{ color:var(--shop-subtle); font-size:12px; margin-left:8px; }
+
+  /* —— Listado —— */
+  .list-header{ display:flex; align-items:center; gap:8px; margin: 22px 0 12px; }
+  .badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:22px; height:22px; padding:0 6px; font-size:12px; font-weight:700;
+    border-radius:999px; color:#033; background:#d5efe9; border:1px solid #b6e0d6;
+  }
+
+  .grid-cards{ display:grid; gap:16px; grid-template-columns: repeat(3, minmax(0,1fr)); }
+  @media (max-width:980px){ .grid-cards{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+  @media (max-width:640px){ .grid-cards{ grid-template-columns: 1fr; } }
+
+  .card{
+    background:var(--shop-surface);
+    border:1px solid #e1e3e5;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .card img{ width:100%; height:180px; object-fit:cover; display:block; }
+  .card .body{ padding:14px; }
+  .card h3{ margin:0 0 6px 0; font-size:16px; }
+  .muted{ color:var(--shop-subtle); font-size:13px; }
+  .price{ font-weight:800; margin:6px 0; }
+  .card .cta{ display:flex; gap:8px; margin-top:10px; }
+  .link-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    padding:8px 10px; border-radius:10px; text-decoration:none; font-weight:700; font-size:13px;
+    border:1px solid #c9cccf; color:#0a0b0c; background:#fff;
+  }
+  .link-btn:hover{ border-color:#9aa0a6; }
+</style>
+</head>
+<body>
+
+<!-- Header / Nav -->
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <img src="logo-baguet.png" alt="Logo Baguet">
+      <div class="title">
+        <strong>BAGUET</strong>
+        <span>LOJA</span>
+      </div>
+    </div>
+    <nav>
+      <a href="#publicar">Publicar</a>
+      <a href="#listado">Listado</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="container">
+  <h2 id="publicar">Publicar un producto</h2>
+  <form id="productForm" class="surface" autocomplete="off">
+    <div class="grid-2">
+      <div>
+        <label>Nombre del producto</label>
+        <input id="nombreProducto" type="text" required placeholder="Ej. Pan artesanal" />
+      </div>
+      <div>
+        <label>Precio (USD)</label>
+        <input id="precioProducto" type="number" step="0.01" min="0" required placeholder="Ej. 1.50" />
+      </div>
+      <div>
+        <label>Nombre del vendedor</label>
+        <input id="nombreVendedor" type="text" required placeholder="Tu nombre" />
+      </div>
+      <div>
+        <label>Teléfono (WhatsApp)</label>
+        <input id="telefono" type="tel" placeholder="+593..." />
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <label>Descripción</label>
+      <textarea id="descripcionProducto" rows="3" placeholder="Horario, punto de entrega, si aceptas trueque, etc."></textarea>
+    </div>
+
+    <div class="file-row" style="margin-top:10px">
+      <div>
+        <label>Imagen (opcional)</label>
+        <input id="imagen" type="file" accept="image/*" />
+        <span class="meta">Se guarda localmente en este dispositivo.</span>
+      </div>
+      <div class="preview" id="previewBox">
+        <span>Vista previa</span>
+        <img id="previewImg" alt="Vista previa"/>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" type="submit">Publicar</button>
+      <span id="status" class="meta"></span>
+    </div>
+  </form>
+
+  <div class="list-header">
+    <h2 id="listado" style="margin:0">Productos publicados</h2>
+    <span class="badge" id="count">0</span>
+  </div>
+
+  <section id="productos" class="grid-cards"></section>
+</main>
+
+<script>
+  // —— Estado y utilidades ——
+  const LS_KEY = "baguet_shopify_like";
+  const form = document.getElementById("productForm");
+  const statusEl = document.getElementById("status");
+  const grid = document.getElementById("productos");
+  const countEl = document.getElementById("count");
+  const fileInput = document.getElementById("imagen");
+  const previewBox = document.getElementById("previewBox");
+  const previewImg = document.getElementById("previewImg");
+  let imageDataURL = "";
+
+  function loadLocal(){
+    try{ return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+    catch{ return []; }
+  }
+  function saveLocal(item){
+    const data = loadLocal();
+    data.unshift(item);
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    return data;
+  }
+
+  function render(list){
+    grid.innerHTML = "";
+    countEl.textContent = list.length;
+    list.forEach(p=>{
+      const tel = (p.telefono||"").replace(/[^0-9+]/g,'');
+      const wsp = tel ? `https://wa.me/${tel}?text=${encodeURIComponent("Hola, me interesa tu producto: "+p.producto)}` : null;
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        ${p.image ? `<img src="${p.image}" alt="${p.producto}">` : ""}
+        <div class="body">
+          <h3>${p.producto}</h3>
+          <div class="muted">Vendedor: ${p.vendedor || "Anónimo"}</div>
+          <div class="price">$${Number(p.precio).toFixed(2)}</div>
+          ${p.descripcion ? `<p class="muted" style="margin:6px 0 0">${p.descripcion}</p>` : ""}
+          <div class="cta">
+            ${wsp ? `<a class="link-btn" target="_blank" href="${wsp}">WhatsApp</a>` : ""}
+            ${tel ? `<a class="link-btn" href="tel:${tel}">Llamar</a>` : ""}
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  // Carga inicial
+  render(loadLocal());
+
+  // Vista previa
+  fileInput.addEventListener("change", ()=>{
+    const file = fileInput.files?.[0];
+    if(!file){ imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display=""; return; }
+    const reader = new FileReader();
+    reader.onload = e=>{
+      imageDataURL = e.target.result;
+      previewImg.src = imageDataURL;
+      previewImg.style.display="block";
+      previewBox.firstElementChild.style.display="none";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Publicar
+  form.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const pub = {
+      producto: document.getElementById("nombreProducto").value.trim(),
+      precio: document.getElementById("precioProducto").value.trim(),
+      vendedor: document.getElementById("nombreVendedor").value.trim(),
+      telefono: document.getElementById("telefono").value.trim(),
+      descripcion: document.getElementById("descripcionProducto").value.trim(),
+      image: imageDataURL
+    };
+    if(!pub.producto || !pub.precio || !pub.vendedor){
+      statusEl.textContent = "Completa producto, precio y vendedor.";
+      return;
+    }
+    const list = saveLocal(pub);
+    render(list);
+    form.reset();
+    imageDataURL="";
+    previewImg.style.display="none";
+    previewBox.firstElementChild.style.display="";
+    statusEl.textContent = "Publicado (guardado en este dispositivo).";
+  });
+</script>
+</body>
+</html>
