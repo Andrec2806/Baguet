@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Baguet — Publicar & Listado (sin servidor)</title>
+<title>Baguet — Publicar & Listado (GitHub Pages, sin servidor)</title>
 <link rel="icon" href="logo-baguet.png" />
 <style>
   :root{--nav:#0e1626;--b1:#2563eb;--b2:#7c3aed;--muted:#64748b;--border:#e7eaf1;--radius:14px}
@@ -98,6 +98,7 @@
             <label>Cámara (foto / video)</label>
             <div class="live"><video id="live" autoplay playsinline muted></video></div>
             <div class="controls">
+              <button type="button" class="btn-s" id="enableCam">Activar cámara</button>
               <button type="button" class="btn-s" id="switchCam">Cambiar cámara</button>
               <button type="button" class="btn-s primary" id="takePhoto">Tomar foto</button>
               <button type="button" class="btn-s" id="startRec">Grabar video</button>
@@ -108,7 +109,7 @@
         </div>
 
         <div style="display:flex;gap:10px;align-items:center;margin-top:14px">
-          <button id="btnPublish" class="btn primary" type="submit">Publicar</button>
+          <button id="btnPublish" class="btn primary" type="submit" disabled>Publicar</button>
           <span id="status" class="muted"></span>
         </div>
       </form>
@@ -131,7 +132,7 @@
 <div id="toast" class="toast"></div>
 
 <script>
-/* ====== Navegación simple (tabs) ====== */
+/* ====== Navegación (tabs) ====== */
 const go = (v)=>{document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));
                  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
                  document.querySelector(`[data-view="${v}"]`).classList.add('active');
@@ -144,27 +145,51 @@ go(location.hash.replace('#','')||'publicar');
 const $=id=>document.getElementById(id);
 const toast=(m)=>{const t=$('toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',1800);};
 
-/* ====== IndexedDB (sin librerías) ====== */
+/* ====== IndexedDB (corregido) ====== */
 const DB_NAME='baguet_local', STORE='posts'; let db;
-function idb(req){return new Promise((res,rej)=>{req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error)});}
-async function openDB(){
-  return new Promise((res,rej)=>{
-    const r=indexedDB.open(DB_NAME,1);
-    r.onupgradeneeded=()=>{r.result.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});};
-    r.onsuccess=()=>{db=r.result;res(db);}; r.onerror=()=>rej(r.error);
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=()=>{ const d=req.result; if(!d.objectStoreNames.contains(STORE)) d.createObjectStore(STORE,{keyPath:'id',autoIncrement:true}); };
+    req.onsuccess=()=>{ db=req.result; resolve(db); };
+    req.onerror =()=>reject(req.error);
   });
 }
-async function addPost(p){const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).add(p); return idb(tx.complete||tx);}
-async function getAll(){return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readonly'); const st=tx.objectStore(STORE); const req=st.getAll(); req.onsuccess=()=>res(req.result||[]); req.onerror=()=>rej(req.error);});}
-async function delPost(id){const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(id); return idb(tx.complete||tx);}
-async function clearAll(){const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).clear(); return idb(tx.complete||tx);}
+function addPost(post){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite'); const st=tx.objectStore(STORE);
+    const req=st.add(post); let key;
+    req.onsuccess=()=>{ key=req.result; };
+    tx.oncomplete =()=>resolve(key);
+    tx.onerror    =()=>reject(tx.error);
+    tx.onabort    =()=>reject(tx.error);
+  });
+}
+function getAll(){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readonly'); const req=tx.objectStore(STORE).getAll();
+    req.onsuccess=()=>resolve(req.result||[]); req.onerror=()=>reject(req.error);
+  });
+}
+function delPost(id){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).delete(id);
+    tx.oncomplete=()=>resolve(); tx.onerror=()=>reject(tx.error); tx.onabort=()=>reject(tx.error);
+  });
+}
+function clearAllDB(){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(STORE,'readwrite'); tx.objectStore(STORE).clear();
+    tx.oncomplete=()=>resolve(); tx.onerror=()=>reject(tx.error); tx.onabort=()=>reject(tx.error);
+  });
+}
 
 /* ====== Adjuntos (compresión de fotos) ====== */
 let pending=[]; // {kind:'image'|'video', dataUrl, type, name}
 const mediaInput=$('mediaInput'), chips=$('chips');
 mediaInput.addEventListener('change', ()=>{ Array.from(mediaInput.files||[]).forEach(addFile); mediaInput.value=''; });
 function addFile(f){
-  if(f.type.startsWith('image/')){ // comprimir a 1600px
+  if(f.type.startsWith('image/')){ // comprimir a 1600px ancho
     const r=new FileReader(); r.onload=e=>{
       const img=new Image(); img.onload=()=>{
         const maxW=1600, q=.82, s=Math.min(1,maxW/img.width);
@@ -183,23 +208,23 @@ function addFile(f){
   }
 }
 function renderChips(){
-  const human=b=> b<1024? b+' B' : b<1048576? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
   chips.innerHTML=pending.map((m,i)=>`<span class="chip">${m.kind==='image'?'🖼️':'🎥'} ${m.name||''} <button type="button" data-x="${i}">✕</button></span>`).join('');
 }
-chips.addEventListener('click',e=>{const b=e.target.closest('[data-x]'); if(!b) return; pending.splice(+b.dataset.x,1); renderChips();});
+chips.addEventListener('click',e=>{ const b=e.target.closest('[data-x]'); if(!b) return; pending.splice(+b.dataset.x,1); renderChips(); });
 
 /* ====== Cámara (foto / video) ====== */
-const live=$('live'), switchBtn=$('switchCam'), photoBtn=$('takePhoto'), recBtn=$('startRec'), stopBtn=$('stopRec'), recHint=$('recHint');
+const live=$('live'), enableBtn=$('enableCam'), switchBtn=$('switchCam'), photoBtn=$('takePhoto'), recBtn=$('startRec'), stopBtn=$('stopRec'), recHint=$('recHint');
 let stream=null, facing='environment', recorder=null, chunks=[], timer=null, t0=0;
+
 async function startCam(){
   try{
-    if(!navigator.mediaDevices) return;
+    if(!navigator.mediaDevices){ toast('Tu navegador no soporta cámara.'); return; }
     if(stream) stream.getTracks().forEach(t=>t.stop());
     stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:facing, width:{ideal:1280}, height:{ideal:720} }, audio:true });
-    live.srcObject=stream;
-  }catch(e){ console.warn('Cam error:',e); toast('Activa permisos de cámara (HTTPS o localhost)'); }
+    live.srcObject = stream;
+  }catch(e){ console.warn(e); toast('Activa permisos de cámara (HTTPS / GitHub Pages).'); }
 }
-startCam();
+enableBtn.addEventListener('click', startCam);
 switchBtn.addEventListener('click', async ()=>{ facing=(facing==='user')?'environment':'user'; await startCam(); });
 photoBtn.addEventListener('click', ()=>{
   if(!stream) return;
@@ -213,7 +238,9 @@ photoBtn.addEventListener('click', ()=>{
 recBtn.addEventListener('click', ()=>{
   if(!stream) return;
   chunks=[];
-  try{ recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9,opus'});}catch{ recorder=new MediaRecorder(stream); }
+  let mr;
+  try{ mr=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9,opus'});}catch{ mr=new MediaRecorder(stream); }
+  recorder=mr;
   recorder.ondataavailable=e=>{ if(e.data.size>0) chunks.push(e.data); };
   recorder.onstop=()=>{
     const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});
@@ -227,103 +254,109 @@ recBtn.addEventListener('click', ()=>{
 });
 stopBtn.addEventListener('click', ()=>{ if(recorder && recorder.state!=='inactive') recorder.stop(); recBtn.disabled=false; stopBtn.disabled=true; });
 
-/* ====== Publicar (guarda en IndexedDB) ====== */
+/* ====== Publicar (guardar en IndexedDB) ====== */
+const posts=new Map(); const feed=$('feed'), countEl=$('count'), q=$('q');
 $('postForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
+  const btn=$('btnPublish'); if(btn.disabled) return;
   const room=($('room').value||'loja').trim();
   const title=$('title').value.trim();
   const price=$('price').value;
   const author=$('author').value.trim() || 'Anónimo';
   const phone=$('phone').value.trim();
   const description=$('description').value.trim();
+
   if(!title || !price || !author){ $('status').textContent='Completa título, precio y tu nombre.'; return; }
-  const image = pending.find(m=>m.kind==='image');   // portada opcional
+
+  const image = pending.find(m=>m.kind==='image'); // portada opcional
   const post = { room, title, price:Number(price), author, phone, description,
                  media:[...pending], cover:image? image.dataUrl : null,
                  created: new Date().toISOString() };
-  await addPost(post);
-  $('status').textContent='Publicado (guardado en este navegador).';
-  // limpiar
-  e.target.reset(); pending=[]; renderChips();
-  // recargar listado y saltar a pestaña
-  await loadRoom(room); go('listado');
+  try{
+    const id = await addPost(post);
+    $('status').textContent='Publicado (guardado en este navegador).';
+    // limpiar
+    e.target.reset(); pending=[]; renderChips();
+    // recargar listado y saltar a pestaña
+    await loadRoom(room);
+    go('listado');
+  }catch(err){
+    console.error(err);
+    $('status').textContent='No se pudo guardar (IndexedDB).';
+  }
 });
 
-/* ====== Listado (desde IndexedDB) ====== */
-const feed=$('feed'), countEl=$('count'), q=$('q');
-const posts=new Map();
-const esc=s=>(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const isVideo=(m)=>m.kind==='video';
-
-function cardHTML(p, id){
-  let strip = '';
-  if (Array.isArray(p.media) && p.media.length){
-    strip = '<div class="strip">' + p.media.map(m=>{
-      if (isVideo(m)) return `<video src="${m.dataUrl}" controls playsinline></video>`;
+/* ====== Listado ====== */
+function esc(s){return (s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function cardHTML(p){
+  let strip='';
+  if(Array.isArray(p.media)&&p.media.length){
+    strip='<div class="strip">'+p.media.map(m=>{
+      if(m.kind==='video') return `<video src="${m.dataUrl}" controls playsinline></video>`;
       return `<img src="${m.dataUrl}" alt="">`;
-    }).join('') + '</div>';
+    }).join('')+'</div>';
   }
   const tel=(p.phone||'').replace(/[^0-9+]/g,'');
-  const contact = tel ? `
+  const contact = `
     <div class="row-actions">
-      <a class="link" target="_blank" href="https://wa.me/${tel}?text=${encodeURIComponent('Hola, me interesa: '+p.title)}">WhatsApp</a>
-      <a class="link" href="tel:${tel}">Llamar</a>
-      <button class="btn" data-del="${id}">Eliminar</button>
-    </div>` : `<div class="row-actions"><button class="btn" data-del="${id}">Eliminar</button></div>`;
-
+      ${tel?`<a class="link" target="_blank" href="https://wa.me/${tel}?text=${encodeURIComponent('Hola, me interesa: '+p.title)}">WhatsApp</a>`:''}
+      ${tel?`<a class="link" href="tel:${tel}">Llamar</a>`:''}
+      <button class="btn" data-del>Eliminar</button>
+    </div>`;
   return `
     <article class="card">
-      ${p.cover ? `<img class="cover" src="${p.cover}" alt="${esc(p.title)}">` : ''}
+      ${p.cover?`<img class="cover" src="${p.cover}" alt="${esc(p.title)}">`:''}
       ${strip}
       <div class="body">
         <h3 style="margin:0 0 6px">${esc(p.title)}</h3>
         <div class="muted">Por ${esc(p.author||'Anónimo')} • ${new Date(p.created).toLocaleString()}</div>
         <div class="price">$${Number(p.price||0).toFixed(2)}</div>
-        ${p.description ? `<p class="muted" style="margin:6px 0 0">${esc(p.description)}</p>` : ''}
+        ${p.description?`<p class="muted" style="margin:6px 0 0">${esc(p.description)}</p>`:''}
         ${contact}
       </div>
     </article>`;
 }
-
 function render(){
   const term=(q.value||'').toLowerCase().trim();
   const arr=[...posts.entries()]
     .filter(([id,p])=>!term || (p.title||'').toLowerCase().includes(term) || (p.author||'').toLowerCase().includes(term))
     .sort((a,b)=> new Date(b[1].created)-new Date(a[1].created));
-  feed.innerHTML = arr.map(([id,p])=> cardHTML(p,id)).join('');
+  feed.innerHTML = arr.map(([id,p],idx)=> {
+    const html = cardHTML(p);
+    // añadimos data-id para eliminar
+    return html.replace('<article class="card">','<article class="card" data-id="'+id+'">');
+  }).join('');
   countEl.textContent = arr.length;
 }
-
 feed.addEventListener('click', async (ev)=>{
-  const del = ev.target.closest('[data-del]');
-  if (!del) return;
-  const id = Number(del.getAttribute('data-del'));
-  if (!confirm('¿Eliminar esta publicación local?')) return;
-  await delPost(id);
-  posts.delete(id);
-  render();
+  const btn = ev.target.closest('[data-del]'); if(!btn) return;
+  const card = ev.target.closest('article[data-id]'); if(!card) return;
+  const id = Number(card.getAttribute('data-id'));
+  if(!confirm('¿Eliminar esta publicación local?')) return;
+  await delPost(id); posts.delete(id); render();
 });
-
 $('clearAll').addEventListener('click', async ()=>{
   if(!confirm('Esto borrará todas tus publicaciones locales.')) return;
-  await clearAll(); posts.clear(); render(); toast('Limpio ✓');
+  await clearAllDB(); posts.clear(); render(); toast('Limpio ✓');
 });
+q.addEventListener('input', render);
 
-/* ====== Carga inicial ====== */
 async function loadRoom(room){
   const list = await getAll();
   posts.clear();
-  list.filter(p=> (p.room||'loja') === (room||'loja')).forEach((p,i)=> posts.set(p.id||i,p));
+  list.filter(p=> (p.room||'loja') === (room||'loja')).forEach(p=> posts.set(p.id, p));
   render();
 }
 
+/* ====== Inicio (habilita Publicar cuando DB está lista) ====== */
 (async function start(){
   if(!('indexedDB' in window)){ alert('Tu navegador no soporta IndexedDB.'); return; }
+  const btn=$('btnPublish'); btn.disabled = true;
   await openDB();
-  const sala = (location.search.match(/sala=([^&#]+)/)||[])[1] ? decodeURIComponent((location.search.match(/sala=([^&#]+)/)||[])[1]) : 'loja';
+  btn.disabled = false; // <- ya se puede publicar
+  const sala=(location.search.match(/sala=([^&#]+)/)||[])[1] ? decodeURIComponent((location.search.match(/sala=([^&#]+)/)||[])[1]) : 'loja';
   $('room').value = sala;
   await loadRoom(sala);
-  q.addEventListener('input', render);
 })();
 </script>
 </body>
