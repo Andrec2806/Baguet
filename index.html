@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Baguet Loja – Red social local</title>
-<meta name="description" content="Baguet Loja: publica y vende productos locales. Salas compartidas por enlace, presencia en línea y feed en vivo.">
+<title>Baguet Loja — Red social local</title>
+<meta name="description" content="Baguet: publica y vende productos locales; salas compartidas por enlace y presencia en vivo.">
 <style>
   :root{
     --nav-bg:#0c1320; --brand-1:#6d28d9; --brand-2:#2563eb; --accent:#10b981;
@@ -28,7 +28,7 @@
   .container{max-width:1120px;margin:26px auto;padding:0 16px}
   .surface{background:#fff;border:1px solid #e8ebf3;border-radius:var(--radius);box-shadow:var(--shadow)}
   h1,h2{margin:0 0 12px}
-  /* PRESENCE (personas en la sala) */
+  /* PRESENCIA */
   .room-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
   .room-id{font-size:14px;color:#334155}
   .presence{display:flex;flex-wrap:wrap;gap:8px}
@@ -83,7 +83,7 @@
 </div>
 
 <main class="container">
-  <!-- Barra de sala y presencia -->
+  <!-- Sala / Presencia -->
   <div class="room-bar">
     <div class="room-id">Sala: <strong id="roomName">—</strong> · <span class="pill" id="onlineCount">0 en línea</span></div>
     <div class="presence" id="presence"></div>
@@ -119,7 +119,7 @@
       <div>
         <label>Imagen (opcional)</label>
         <input id="imagen" type="file" accept="image/*" />
-        <div class="muted" style="margin-top:6px">Se guarda localmente y, si activas Firebase, se comparte con la sala.</div>
+        <div class="muted" style="margin-top:6px">Se comparte en la sala (comprimida para ahorrar datos).</div>
       </div>
       <div class="preview" id="previewBox">
         <span>Vista previa</span>
@@ -141,16 +141,13 @@
   <section id="productos" class="grid-cards"></section>
 </main>
 
-<!-- Firebase (opcional, para tiempo real entre personas con el link) -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-  /**************  CONFIGURA AQUÍ PARA TIEMPO REAL  ****************
-   * 1) Crea un proyecto en Firebase → Realtime Database (modo de prueba)
-   * 2) Copia tu configuración y pégala en FIREBASE_CONFIG
-   * 3) Publica esta página. Cualquiera con el link ?sala=xxxxx verá presencia y feed en vivo.
-   *****************************************************************/
+  /* ====== CONFIGURA TU FIREBASE AQUÍ ====== */
   const FIREBASE_CONFIG = {
     apiKey: "PASTE_API_KEY",
     authDomain: "PASTE_AUTH_DOMAIN",
@@ -162,25 +159,25 @@
   };
   const USE_FIREBASE = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "PASTE_API_KEY";
 
-  // Sala desde ?sala=xxx o #xxx
+  // Sala desde ?sala=xxx (por defecto 'publico')
   const params = new URLSearchParams(location.search);
-  const roomId = params.get('sala') || (location.hash ? location.hash.slice(1) : 'publico');
+  const roomId = params.get('sala') || 'publico';
   document.getElementById('roomName').textContent = roomId;
 
-  // Nombre del usuario
+  // Nombre guardado
   const nameInput = document.getElementById('nombreVendedor');
   const savedName = localStorage.getItem('baguet_name') || '';
   if (savedName) nameInput.value = savedName;
   nameInput.addEventListener('input', ()=> localStorage.setItem('baguet_name', nameInput.value.trim()));
 
-  // Compartir link de sala
+  // Copiar link de sala
   document.getElementById('copyLinkBtn').addEventListener('click', async ()=>{
     const link = location.origin + location.pathname + '?sala=' + encodeURIComponent(roomId);
     await navigator.clipboard.writeText(link);
     alert('Link copiado: ' + link);
   });
 
-  // Estado local (offline)
+  // Estado local (para funcionar offline también)
   const LS_KEY = "baguet_social_" + roomId;
   const form = document.getElementById("productForm");
   const statusEl = document.getElementById("status");
@@ -196,22 +193,18 @@
   function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch{ return []; } }
   function saveLocal(item){ const data=loadLocal(); data.unshift(item); localStorage.setItem(LS_KEY, JSON.stringify(data)); return data; }
 
-  function avatarColor(seed){
-    // color pastel determinístico por nombre
-    let h=0; for (let i=0;i<seed.length;i++) h = (h*31 + seed.charCodeAt(i)) % 360;
-    return `hsl(${h} 70% 45%)`;
-  }
+  function avatarColor(seed){ let h=0; for (let i=0;i<seed.length;i++) h=(h*31 + seed.charCodeAt(i))%360; return `hsl(${h} 70% 45%)`; }
 
   function renderPresence(list, meName){
     presenceBox.innerHTML = "";
     const arr = list && list.length ? list : (meName ? [{name:meName}] : []);
     arr.forEach(u=>{
-      const av = document.createElement('div');
-      av.className = 'avatar';
-      av.textContent = (u.name||'¿?').trim().charAt(0).toUpperCase();
-      av.title = u.name||'Anónimo';
-      av.style.background = avatarColor(u.name||'x');
-      if (u.isMe) av.dataset.me = "1";
+      const av=document.createElement('div');
+      av.className='avatar';
+      av.textContent=(u.name||'¿?').trim().charAt(0).toUpperCase();
+      av.title=u.name||'Anónimo';
+      av.style.background=avatarColor(u.name||'x');
+      if (u.isMe) av.dataset.me="1";
       presenceBox.appendChild(av);
     });
     onlineCount.textContent = `${arr.length} en línea`;
@@ -244,27 +237,86 @@
   render(loadLocal());
   renderPresence([], nameInput.value.trim() || "Invitado");
 
-  // Vista previa
+  // Vista previa + compresión simple
   fileInput.addEventListener("change", ()=>{
     const file=fileInput.files?.[0];
     if(!file){ imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display=""; return; }
     const reader=new FileReader();
     reader.onload=e=>{
-      imageDataURL=e.target.result;
-      previewImg.src=imageDataURL;
-      previewImg.style.display="block";
-      previewBox.firstElementChild.style.display="none";
+      const img=new Image();
+      img.onload=()=>{
+        const maxW=1000, q=0.8;
+        const s=Math.min(1, maxW/img.width);
+        const w=Math.round(img.width*s), h=Math.round(img.height*s);
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
+        imageDataURL=canvas.toDataURL('image/jpeg', q);
+        previewImg.src=imageDataURL; previewImg.style.display="block"; previewBox.firstElementChild.style.display="none";
+      };
+      img.src=e.target.result;
     };
     reader.readAsDataURL(file);
   });
 
-  // Publicar
+  // ======== Firebase en tiempo real (social) ========
+  let db=null, auth=null, uid=null, myPresenceRef=null;
+  if (USE_FIREBASE) {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    auth = firebase.auth();
+    db = firebase.database();
+
+    auth.signInAnonymously().catch(console.error);
+    auth.onAuthStateChanged(user=>{
+      if (!user) return;
+      uid = user.uid;
+
+      // PRESENCE
+      const meName = nameInput.value.trim() || "Invitado";
+      const presRef = db.ref(`rooms/${roomId}/presence`);
+      myPresenceRef = presRef.child(uid);
+      firebase.database().ref(".info/connected").on("value", snap=>{
+        if (snap.val() === true) {
+          myPresenceRef.onDisconnect().remove();
+          myPresenceRef.set({ name: meName, ts: firebase.database.ServerValue.TIMESTAMP });
+        }
+      });
+      // Update name live
+      nameInput.addEventListener('input', ()=>{
+        const nm = nameInput.value.trim() || "Invitado";
+        localStorage.setItem('baguet_name', nm);
+        if (myPresenceRef) myPresenceRef.set({ name:nm, ts: firebase.database.ServerValue.TIMESTAMP });
+      });
+
+      // Escuchar presencia
+      presRef.on("value", snap=>{
+        const val = snap.val() || {};
+        const arr = Object.keys(val).map(k => ({...val[k], isMe: k===uid}));
+        renderPresence(arr, meName);
+      });
+
+      // FEED: escuchar últimos 200
+      const postsRef = db.ref(`rooms/${roomId}/posts`).limitToLast(200);
+      const remote = [];
+      postsRef.on("child_added", s=>{
+        const item=s.val(); remote.unshift(item);
+        // Combinar con local
+        const local = loadLocal();
+        const key = p => [p.producto,p.vendedor,p.precio,p.ts].join("|");
+        const map = new Map([...remote, ...local].map(x => [key(x), x]));
+        const arr = Array.from(map.values()).sort((a,b)=>b.ts-a.ts);
+        render(arr); countEl.textContent = arr.length;
+      });
+    });
+  }
+
+  // Publicar (local + remoto)
   form.addEventListener("submit",(e)=>{
     e.preventDefault();
     const pub={
       producto:document.getElementById("nombreProducto").value.trim(),
       precio:document.getElementById("precioProducto").value.trim(),
-      vendedor:document.getElementById("nombreVendedor").value.trim(),
+      vendedor:nameInput.value.trim() || "Anónimo",
       telefono:document.getElementById("telefono").value.trim(),
       descripcion:document.getElementById("descripcionProducto").value.trim(),
       image:imageDataURL,
@@ -273,61 +325,19 @@
     if(!pub.producto || !pub.precio || !pub.vendedor){
       statusEl.textContent="Completa producto, precio y vendedor."; return;
     }
-    const list=saveLocal(pub);
-    render(list);
+    // Local
+    const list=saveLocal(pub); render(list);
     statusEl.textContent="Publicado.";
+
+    // Remoto
+    if (db){ db.ref(`rooms/${roomId}/posts`).push(pub); }
+
     form.reset(); imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display="";
-    // También al remoto si hay Firebase
-    if (USE_FIREBASE && window.fbDB){
-      window.fbDB.ref(`rooms/${roomId}/posts`).push(pub);
-    }
   });
 
-  // ==== Realtime con Firebase (opcional) ====
-  if (USE_FIREBASE) {
-    try{
-      const app = firebase.initializeApp(FIREBASE_CONFIG);
-      const db = firebase.database();
-      window.fbDB = db;
-
-      // PRESENCE
-      const myName = nameInput.value.trim() || "Invitado";
-      const presenceRef = db.ref(`rooms/${roomId}/presence`);
-      const meId = db.ref().push().key;
-      const meRef = presenceRef.child(meId);
-
-      firebase.database().ref(".info/connected").on("value", snap=>{
-        if (snap.val() === true) {
-          meRef.onDisconnect().remove();
-          meRef.set({ name: myName, ts: firebase.database.ServerValue.TIMESTAMP });
-        }
-      });
-
-      presenceRef.on("value", snap=>{
-        const val = snap.val() || {};
-        const arr = Object.keys(val).map(k => ({...val[k], isMe:false}));
-        // si mi nombre no está (p. ej. mientras se conecta), muestro local
-        if (!arr.length) renderPresence([], myName); else renderPresence(arr, myName);
-      });
-
-      // POSTS FEED
-      const postsRef = db.ref(`rooms/${roomId}/posts`);
-      const remote = [];
-      postsRef.on("child_added", snap=>{
-        const item = snap.val();
-        remote.unshift(item);
-        // mezclar con local (por si publiqué offline)
-        const local = loadLocal();
-        // clave simple por concatenación
-        const key = p => [p.producto,p.vendedor,p.precio,p.ts].join("|");
-        const map = new Map([...remote, ...local].map(x => [key(x), x]));
-        render(Array.from(map.values()).sort((a,b)=>b.ts - a.ts));
-        countEl.textContent = map.size;
-      });
-
-    } catch (e) {
-      console.warn("Firebase no inicializado, se usa modo local:", e);
-    }
+  // Mostrar cuántos hay aunque no uses Firebase (tu “yo” local)
+  if (!USE_FIREBASE) {
+    renderPresence([{name: nameInput.value.trim() || "Invitado", isMe:true}], nameInput.value.trim() || "Invitado");
   }
 </script>
 </body>
