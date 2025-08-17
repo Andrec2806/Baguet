@@ -1,285 +1,455 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Baguet – Capturar fotos y videos</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Baguet Loja — Publica con fotos y videos</title>
+<meta name="description" content="Baguet Loja: publica productos con fotos y videos, también desde la cámara.">
 <style>
   :root{
-    --nav:#0c1320; --brand1:#2563eb; --brand2:#6d28d9;
-    --bg:#f5f7fb; --ink:#0f1720; --muted:#6b7280;
+    /* Paleta SaaS */
+    --nav:#0c1320; --brand1:#2563eb; --brand2:#6d28d9; --accent:#10b981;
+    --ink:#0f1720; --muted:#6b7280; --bg:#f5f7fb; --surface:#ffffff;
     --radius:14px; --shadow:0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
-  .nav{position:sticky;top:0;z-index:10;background:var(--nav);color:#e5eef7;border-bottom:1px solid rgba(255,255,255,.08)}
-  .nav-inner{max-width:1100px;margin:auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
-  .nav img{width:40px;height:40px;border-radius:10px;background:#fff;object-fit:cover}
-  .brand{line-height:1}
-  .brand b{display:block;letter-spacing:.3px}
-  .brand small{opacity:.8}
-  .container{max-width:1100px;margin:22px auto;padding:0 16px}
-  .surface{background:#fff;border:1px solid #e7eaf1;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
-  .grid{display:grid;gap:14px;grid-template-columns:1fr 1fr}
-  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
-  label{font-size:13px;color:#475569;margin-bottom:6px;display:block}
-  input[type="text"], input[type="number"], input[type="file"]{width:100%;padding:10px;border:1px solid #cfd5e1;border-radius:10px}
-  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-  .btn{appearance:none;border:1px solid #cfd5e1;background:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
-  .btn-primary{border:none;background:linear-gradient(180deg,var(--brand1),var(--brand2));color:#fff}
-  .hint{font-size:12px;color:var(--muted)}
-  .video-wrap{position:relative;background:#000;border-radius:12px;overflow:hidden}
-  video#live{width:100%;height:auto;display:block}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:var(--ink);background:var(--bg)}
+
+  /* NAV */
+  .nav{position:sticky;top:0;z-index:50;background:var(--nav);color:#e5eef7;border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav-inner{max-width:1120px;margin:auto;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
+  .brand{display:flex;gap:10px;align-items:center}
+  .brand img{width:40px;height:40px;border-radius:10px;object-fit:cover;background:#fff}
+  .brand .t b{display:block;font-size:16px;letter-spacing:.3px}
+  .brand .t span{font-size:11px;opacity:.85;letter-spacing:1px}
+  .btn{appearance:none;border:1px solid rgba(255,255,255,.25);background:transparent;color:#e5eef7;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
+  .btn:hover{border-color:#fff}
+  .btn-primary{border:none;background:linear-gradient(180deg,var(--brand1),var(--brand2));color:#fff;box-shadow:var(--shadow)}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg, rgba(37,99,235,.14), rgba(109,40,217,.18));border-bottom:1px solid #e7e9f1}
+  .hero-inner{max-width:1120px;margin:auto;padding:46px 16px 28px;display:grid;grid-template-columns:1.15fr .85fr;gap:32px;align-items:center}
+  @media (max-width:980px){.hero-inner{grid-template-columns:1fr}}
+  .kicker{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;background:#eef5ff;border:1px solid #d7e7ff;color:#1f2937;font-size:12px;font-weight:700}
+  .hero h1{margin:14px 0 10px;font-size:36px;line-height:1.1;letter-spacing:-.4px}
+  .hero p{color:#334155;margin:0 0 14px}
+
+  /* CONTAINER */
+  .container{max-width:1120px;margin:26px auto;padding:0 16px}
+
+  /* FORM / SURFACE */
+  .surface{background:#fff;border:1px solid #e8ebf3;border-radius:var(--radius);box-shadow:var(--shadow)}
+  form.surface{padding:18px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:720px){.grid-2{grid-template-columns:1fr}}
+  label{display:block;font-size:13px;color:#475569;margin:2px 0 6px}
+  input[type="text"],input[type="number"],input[type="tel"],textarea{
+    width:100%;padding:12px;border:1px solid #cfd5e1;border-radius:10px;font-size:14px;background:#fff}
+  input:focus,textarea:focus{outline:none;border-color:#9ac5ff;box-shadow:0 0 0 3px rgba(37,99,235,.16)}
+  textarea{resize:vertical;min-height:84px}
+  .muted{color:var(--muted);font-size:13px}
+
+  /* MEDIA PICKER */
+  .picker-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
+  @media (max-width:900px){.picker-row{grid-template-columns:1fr}}
+  .box{border:1px dashed #cfd5e1;border-radius:12px;padding:12px;background:#fafbff}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .chip{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;border:1px solid #c9d3e5;background:#fff;font-size:12px}
+  .chip button{border:none;background:transparent;color:#ef4444;cursor:pointer}
+
   .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .gallery{display:grid;gap:14px;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px}
-  @media (max-width:1000px){ .gallery{grid-template-columns:repeat(2,minmax(0,1fr))} }
-  @media (max-width:640px){ .gallery{grid-template-columns:1fr} }
-  .card{background:#fff;border:1px solid #e7eaf1;border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
-  .thumb{width:100%;height:220px;object-fit:cover;background:#f1f3f7;display:block}
-  .card .body{padding:10px}
-  .meta{font-size:12px;color:var(--muted)}
-  .actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-  .tag{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:#eef5ff;border:1px solid #d7e7ff;font-size:12px;font-weight:700;color:#344}
+  .btn-s{padding:8px 10px;border-radius:10px;border:1px solid #cfd5e1;background:#fff;cursor:pointer;font-weight:700}
+  .btn-s.primary{border:none;background:linear-gradient(180deg,var(--brand1),var(--brand2));color:#fff}
+  .live-wrap{border-radius:12px;overflow:hidden;background:#000}
+  #live{width:100%;height:auto;display:block}
+  #recTime{font-size:12px;color:#dc2626;margin-left:6px}
+
+  /* LISTADO */
+  .list-header{display:flex;align-items:center;gap:8px;margin:22px 0 12px}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;font-size:12px;font-weight:700;border-radius:999px;color:#033;background:#d5efe9;border:1px solid #b6e0d6}
+  .grid-cards{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:980px){.grid-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:640px){.grid-cards{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid #e8ebf3;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .card .body{padding:14px}
+  .card h3{margin:0 0 6px 0;font-size:16px}
+  .price{font-weight:800;margin:6px 0}
+  .media-row{display:flex;gap:8px;overflow:auto;padding:8px;background:#fafafa;border-top:1px solid #eef0f4}
+  .media-row img,.media-row video{width:160px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #e1e4ea;background:#f1f3f7}
+  .cta{display:flex;gap:8px;margin-top:10px}
+  .link-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid #c9cccf;background:#fff;text-decoration:none;color:#111;font-weight:700;font-size:13px}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<header class="nav">
+<div class="nav">
   <div class="nav-inner">
-    <img src="logo-baguet.png" alt="Baguet Loja" />
-    <div class="brand"><b>BAGUET</b><small>LOJA</small></div>
+    <div class="brand">
+      <img src="logo-baguet.png" alt="Baguet Loja">
+      <div class="t"><b>BAGUET</b><span>LOJA</span></div>
+    </div>
+    <div></div>
+    <div>
+      <a class="btn" href="#listado">Ver listado</a>
+      <a class="btn btn-primary" href="#publicar">Publicar</a>
+    </div>
   </div>
-</header>
+</div>
 
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <span class="kicker">Vende fácil • Ahora con fotos y videos</span>
+      <h1>Publica tus productos con <span style="background:linear-gradient(90deg,var(--brand1),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent">galería multimedia</span></h1>
+      <p>Sube varias fotos, graba un video desde la cámara y comparte por WhatsApp. Todo queda guardado en tu teléfono.</p>
+      <div class="controls">
+        <a class="btn btn-primary" href="#publicar">Comenzar ahora</a>
+        <a class="btn" style="border-color:#d7e7ff;color:#0f1720;background:#f0f5ff" href="#listado">Ver publicaciones</a>
+      </div>
+    </div>
+    <div class="surface" style="padding:16px">
+      <b>Tips rápidos</b>
+      <ul style="margin:8px 0 0 18px;color:#475569;font-size:14px;line-height:1.5">
+        <li>Las fotos se optimizan para ahorrar datos.</li>
+        <li>Los videos se guardan en formato webm (compatible en móviles modernos).</li>
+        <li>La información se guarda localmente; puedes borrar o volver a publicar.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLICAR -->
 <main class="container">
-
-  <!-- Cargar archivos -->
-  <section class="surface">
-    <div class="grid">
+  <h2 id="publicar" style="margin:0 0 10px">Publicar un producto</h2>
+  <form id="productForm" class="surface" autocomplete="off">
+    <div class="grid-2">
       <div>
-        <label>Subir fotos o videos (múltiples)</label>
-        <input id="picker" type="file" accept="image/*,video/*" multiple />
-        <div class="hint">Consejo: en móviles puedes abrir la cámara desde aquí si tu navegador lo permite.</div>
+        <label>Nombre del producto</label>
+        <input id="nombreProducto" type="text" required placeholder="Ej. Pan artesanal" />
+      </div>
+      <div>
+        <label>Precio (USD)</label>
+        <input id="precioProducto" type="number" step="0.01" min="0" required placeholder="1.50" />
+      </div>
+      <div>
+        <label>Nombre del vendedor</label>
+        <input id="nombreVendedor" type="text" required placeholder="Tu nombre" />
+      </div>
+      <div>
+        <label>Teléfono (WhatsApp)</label>
+        <input id="telefono" type="tel" placeholder="+593..." />
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <label>Descripción</label>
+      <textarea id="descripcionProducto" rows="3" placeholder="Horario, punto de entrega, si aceptas trueque, etc."></textarea>
+    </div>
+
+    <!-- Adjuntos -->
+    <div class="picker-row">
+      <!-- Archivos -->
+      <div class="box">
+        <label>Adjuntar fotos y videos (múltiples)</label>
+        <input id="filePicker" type="file" accept="image/*,video/*" multiple />
+        <div class="muted" style="margin-top:6px">Se optimizarán las fotos; los videos se mantendrán en formato original.</div>
+        <div id="chips" class="chips"></div>
       </div>
 
-      <div>
-        <label>Cámara (foto y video)</label>
-        <div class="video-wrap">
-          <video id="live" playsinline autoplay muted></video>
-        </div>
+      <!-- Cámara -->
+      <div class="box">
+        <label>Cámara (foto/video)</label>
+        <div class="live-wrap"><video id="live" playsinline autoplay muted></video></div>
         <div class="controls">
-          <button class="btn" id="toggleFacing">Cambiar cámara (frontal/trasera)</button>
-          <button class="btn" id="takePhoto">Tomar foto</button>
-          <button class="btn" id="startRec">Grabar video</button>
-          <button class="btn" id="stopRec" disabled>Detener</button>
-          <span class="hint" id="recHint">–</span>
+          <button class="btn-s" id="toggleFacing" type="button">Cambiar cámara</button>
+          <button class="btn-s primary" id="takePhoto" type="button">Tomar foto</button>
+          <button class="btn-s" id="startRec" type="button">Grabar video</button>
+          <button class="btn-s" id="stopRec" type="button" disabled>Detener</button>
+          <span class="muted" id="recTime">–</span>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- Galería -->
-  <section class="surface">
-    <div class="row" style="justify-content:space-between">
-      <h3 style="margin:4px 0">Galería</h3>
-      <span class="tag"><span id="count">0</span>&nbsp; ítems</span>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:14px">
+      <button class="btn btn-primary" type="submit">Publicar</button>
+      <span id="status" class="muted"></span>
     </div>
-    <div id="gallery" class="gallery"></div>
-  </section>
+  </form>
 
+  <!-- LISTADO -->
+  <div class="list-header" id="listado">
+    <h2 style="margin:0">Publicaciones</h2>
+    <span class="badge" id="count">0</span>
+  </div>
+  <section id="productos" class="grid-cards"></section>
 </main>
 
-<!-- Lógica -->
 <script>
-(() => {
-  /*** Estado ***/
-  const picker = document.getElementById('picker');
-  const gallery = document.getElementById('gallery');
-  const countEl = document.getElementById('count');
-  const live = document.getElementById('live');
-  const toggleFacingBtn = document.getElementById('toggleFacing');
-  const takePhotoBtn = document.getElementById('takePhoto');
-  const startRecBtn = document.getElementById('startRec');
-  const stopRecBtn = document.getElementById('stopRec');
-  const recHint = document.getElementById('recHint');
+/* =========================
+   PERSISTENCIA
+   - Posts (texto + lista de IDs de media) => localStorage
+   - Blobs de media (fotos/videos) => IndexedDB
+   ========================= */
+const LS_KEY = "baguet_posts_v2";
+const DB_NAME = "baguet_media_db";
+let db = null;
 
-  let items = []; // {type:'image'|'video', blob, url, name, size, created}
-  let stream = null;
-  let facingMode = 'environment'; // 'user' o 'environment'
-  let mediaRecorder = null;
-  let recChunks = [];
-  let recTimer = null;
-  let recStartAt = 0;
-
-  /*** Helpers ***/
-  const pad = n => String(n).padStart(2,'0');
-  const tsName = (prefix, ext) => {
-    const d = new Date();
-    const name = `${prefix}_${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}.${ext}`;
-    return name;
-  };
-  const humanSize = b => {
-    if (b<1024) return b+' B';
-    if (b<1024*1024) return (b/1024).toFixed(1)+' KB';
-    return (b/(1024*1024)).toFixed(1)+' MB';
-  };
-  const resetTimer = () => { clearInterval(recTimer); recTimer=null; recHint.textContent='–'; };
-
-  /*** Cámara ***/
-  async function startCamera() {
-    try {
-      if (stream) stream.getTracks().forEach(t => t.stop());
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode, width: {ideal: 1280}, height: {ideal: 720} },
-        audio: true
-      });
-      live.srcObject = stream;
-    } catch (err) {
-      console.error(err);
-      alert('No se pudo acceder a la cámara/micrófono. Revisa permisos del navegador.');
-    }
-  }
-
-  toggleFacingBtn.addEventListener('click', async () => {
-    facingMode = (facingMode === 'user') ? 'environment' : 'user';
-    await startCamera();
-  });
-
-  // Foto desde el stream (canvas)
-  takePhotoBtn.addEventListener('click', () => {
-    if (!stream) return;
-    const track = stream.getVideoTracks()[0];
-    const settings = track.getSettings();
-    const w = settings.width || 1280;
-    const h = settings.height || 720;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(live, 0, 0, w, h);
-    canvas.toBlob((blob) => {
-      const url = URL.createObjectURL(blob);
-      addItem({ type:'image', blob, url, name: tsName('foto','jpg'), size: blob.size });
-    }, 'image/jpeg', 0.9);
-  });
-
-  // Grabar video
-  startRecBtn.addEventListener('click', () => {
-    if (!stream) return;
-    recChunks = [];
-    try{
-      mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9,opus' });
-    }catch{
-      mediaRecorder = new MediaRecorder(stream); // fallback
-    }
-    mediaRecorder.ondataavailable = (e)=>{ if (e.data.size>0) recChunks.push(e.data); };
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(recChunks, { type: mediaRecorder.mimeType || 'video/webm' });
-      const url = URL.createObjectURL(blob);
-      addItem({ type:'video', blob, url, name: tsName('video', blob.type.includes('mp4')?'mp4':'webm'), size: blob.size });
-      resetTimer();
+// Abrir IndexedDB
+function openDB(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = e=>{
+      const d = e.target.result;
+      if(!d.objectStoreNames.contains("media")){
+        d.createObjectStore("media", { keyPath: "id" }); // {id, type, name, blob}
+      }
     };
-    mediaRecorder.start();
-    recStartAt = Date.now();
-    recTimer = setInterval(()=>{
-      const s = Math.floor((Date.now()-recStartAt)/1000);
-      const mm = pad(Math.floor(s/60)), ss = pad(s%60);
-      recHint.textContent = `Grabando ${mm}:${ss}`;
-    }, 500);
-    startRecBtn.disabled = true;
-    stopRecBtn.disabled = false;
+    req.onsuccess = ()=>{ db = req.result; resolve(db); };
+    req.onerror = ()=> reject(req.error);
   });
+}
+function id() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+function putMedia(rec){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("media","readwrite");
+    tx.objectStore("media").put(rec);
+    tx.oncomplete = ()=> resolve(rec.id);
+    tx.onerror = ()=> reject(tx.error);
+  });
+}
+function getMedia(id){
+  return new Promise((resolve,reject)=>{
+    const tx = db.transaction("media","readonly");
+    const req = tx.objectStore("media").get(id);
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+function loadPosts(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch{ return []; } }
+function savePosts(list){ localStorage.setItem(LS_KEY, JSON.stringify(list)); }
 
-  stopRecBtn.addEventListener('click', () => {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
+/* =========================
+   UI refs / Estado temporal
+   ========================= */
+const form = document.getElementById("productForm");
+const grid = document.getElementById("productos");
+const countEl = document.getElementById("count");
+const statusEl = document.getElementById("status");
+
+const filePicker = document.getElementById("filePicker");
+const chips = document.getElementById("chips");
+const live = document.getElementById("live");
+const btnFacing = document.getElementById("toggleFacing");
+const btnPhoto = document.getElementById("takePhoto");
+const btnStart = document.getElementById("startRec");
+const btnStop = document.getElementById("stopRec");
+const recTime = document.getElementById("recTime");
+
+let pendingMedia = []; // {id?, type:'image'|'video', name, blob}
+let stream = null, facing="environment", rec=null, recChunks=[], recTimer=null, recStart=0;
+
+// Helpers varios
+const pad2 = n=> String(n).padStart(2,"0");
+function humanSize(b){ if(b<1024) return b+" B"; if(b<1024*1024) return (b/1024).toFixed(1)+" KB"; return (b/(1024*1024)).toFixed(1)+" MB"; }
+function chipHTML(m, idx){
+  const icon = m.type==="image" ? "🖼️" : "🎥";
+  return `<span class="chip">${icon} ${m.name || (m.type+".blob")} <small style="color:#64748b">(${humanSize(m.blob.size)})</small>
+          <button type="button" data-remove="${idx}" title="Quitar">✕</button></span>`;
+}
+function refreshChips(){
+  chips.innerHTML = pendingMedia.map((m,i)=>chipHTML(m,i)).join("");
+}
+
+// Lectura de archivos
+filePicker.addEventListener("change", ()=>{
+  const files = Array.from(filePicker.files||[]);
+  if(!files.length) return;
+  const maxItems = 10;
+  for(const f of files){
+    if(pendingMedia.length >= maxItems) break;
+    if(f.type.startsWith("image/")){
+      // Comprimir imagen
+      const reader = new FileReader();
+      reader.onload = e=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const maxW = 1600, q = .82;
+          const s = Math.min(1, maxW/img.width);
+          const w = Math.round(img.width*s), h = Math.round(img.height*s);
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img,0,0,w,h);
+          canvas.toBlob(blob=>{
+            pendingMedia.push({ type:"image", name: f.name || ("foto_"+Date.now()+".jpg"), blob });
+            refreshChips();
+          }, "image/jpeg", q);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(f);
+    }else if(f.type.startsWith("video/")){
+      pendingMedia.push({ type:"video", name: f.name || ("video_"+Date.now()+".webm"), blob: f });
     }
-    startRecBtn.disabled = false;
-    stopRecBtn.disabled = true;
-  });
+  }
+  refreshChips();
+  filePicker.value="";
+});
+chips.addEventListener("click",(ev)=>{
+  const btn = ev.target.closest("[data-remove]");
+  if(!btn) return;
+  const i = Number(btn.getAttribute("data-remove"));
+  pendingMedia.splice(i,1);
+  refreshChips();
+});
 
-  /*** Cargar archivos del dispositivo ***/
-  picker.addEventListener('change', async () => {
-    const files = Array.from(picker.files || []);
-    for (const f of files) {
-      if (f.type.startsWith('image/')) {
-        // Mostrar directo; si quieres comprimir, podrías pasar por canvas
-        const url = URL.createObjectURL(f);
-        addItem({ type:'image', blob:f, url, name: f.name, size:f.size });
-      } else if (f.type.startsWith('video/')) {
-        const url = URL.createObjectURL(f);
-        addItem({ type:'video', blob:f, url, name: f.name, size:f.size });
-      }
+/* =========================
+   Cámara (foto / video)
+   ========================= */
+async function startCamera(){
+  try{
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:facing, width:{ideal:1280}, height:{ideal:720} }, audio:true });
+    live.srcObject = stream;
+  }catch(e){
+    console.error(e);
+    alert("No se pudo acceder a la cámara/micrófono. Revisa permisos del navegador.");
+  }
+}
+btnFacing.addEventListener("click", async ()=>{
+  facing = (facing==="user")? "environment" : "user";
+  await startCamera();
+});
+btnPhoto.addEventListener("click", ()=>{
+  if(!stream) return;
+  const track = stream.getVideoTracks()[0];
+  const s = track.getSettings();
+  const w = s.width || 1280, h = s.height || 720;
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(live,0,0,w,h);
+  canvas.toBlob(blob=>{
+    pendingMedia.push({ type:"image", name: "foto_"+Date.now()+".jpg", blob });
+    refreshChips();
+  }, "image/jpeg", .9);
+});
+btnStart.addEventListener("click", ()=>{
+  if(!stream) return;
+  recChunks = [];
+  try{ rec = new MediaRecorder(stream, { mimeType:"video/webm;codecs=vp9,opus" }); }
+  catch{ rec = new MediaRecorder(stream); }
+  rec.ondataavailable = e=>{ if(e.data.size>0) recChunks.push(e.data); };
+  rec.onstop = ()=>{
+    const blob = new Blob(recChunks, { type: rec.mimeType || "video/webm" });
+    pendingMedia.push({ type:"video", name:"video_"+Date.now()+".webm", blob });
+    refreshChips();
+    clearInterval(recTimer); recTime.textContent="–";
+  };
+  rec.start();
+  recStart = Date.now();
+  recTimer = setInterval(()=>{
+    const s = Math.floor((Date.now()-recStart)/1000);
+    recTime.textContent = "Grabando " + pad2(Math.floor(s/60)) + ":" + pad2(s%60);
+  }, 500);
+  btnStart.disabled = true; btnStop.disabled = false;
+});
+btnStop.addEventListener("click", ()=>{
+  if(rec && rec.state!=="inactive") rec.stop();
+  btnStart.disabled = false; btnStop.disabled = true;
+});
+
+/* =========================
+   Render de publicaciones
+   ========================= */
+async function render(list){
+  grid.innerHTML = "";
+  countEl.textContent = list.length;
+  for(const p of list){
+    const card = document.createElement("article");
+    card.className = "card";
+    const body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = `
+      <h3>${p.producto}</h3>
+      <div class="muted">Vendedor: ${p.vendedor||"Anónimo"} • ${new Date(p.ts).toLocaleString()}</div>
+      <div class="price">$${Number(p.precio||0).toFixed(2)}</div>
+      ${p.descripcion ? `<p class="muted" style="margin:6px 0 0">${p.descripcion}</p>` : ""}
+    `;
+    // Galería (mini carrusel)
+    const row = document.createElement("div"); row.className = "media-row";
+    for(const m of (p.media||[])){
+      // m = {id, type, name}
+      try{
+        const rec = await getMedia(m.id);
+        if(!rec) continue;
+        const url = URL.createObjectURL(rec.blob);
+        if(rec.type==="image"){
+          const img = document.createElement("img"); img.src=url; img.alt=m.name; row.appendChild(img);
+        }else{
+          const vid = document.createElement("video"); vid.src=url; vid.controls=true; vid.playsInline=true; row.appendChild(vid);
+        }
+      }catch{}
     }
-    picker.value = '';
-  });
-
-  /*** Galería ***/
-  function addItem(obj){
-    items.unshift({ ...obj, created: new Date() });
-    render();
+    if((p.media||[]).length){ card.appendChild(row); }
+    // CTA
+    const tel=(p.telefono||"").replace(/[^0-9+]/g,'');
+    const cta=document.createElement("div"); cta.className="cta";
+    if(tel){
+      const w=document.createElement("a"); w.className="link-btn"; w.target="_blank";
+      w.href=`https://wa.me/${tel}?text=${encodeURIComponent("Hola, me interesa: "+p.producto)}`; w.textContent="WhatsApp";
+      const t=document.createElement("a"); t.className="link-btn"; t.href=`tel:${tel}`; t.textContent="Llamar";
+      cta.appendChild(w); cta.appendChild(t);
+    }
+    body.appendChild(cta);
+    card.appendChild(body);
+    grid.appendChild(card);
   }
+}
 
-  function render(){
-    gallery.innerHTML = '';
-    items.forEach((it, idx) => {
-      const card = document.createElement('article');
-      card.className = 'card';
-
-      if (it.type === 'image') {
-        const img = document.createElement('img');
-        img.className = 'thumb';
-        img.src = it.url;
-        img.alt = it.name;
-        card.appendChild(img);
-      } else {
-        // mini reproductor
-        const v = document.createElement('video');
-        v.className = 'thumb';
-        v.src = it.url;
-        v.controls = true;
-        v.playsInline = true;
-        card.appendChild(v);
-      }
-
-      const body = document.createElement('div');
-      body.className = 'body';
-      body.innerHTML = `
-        <div class="meta">${it.type.toUpperCase()} • ${it.name}</div>
-        <div class="meta">Tamaño: ${humanSize(it.size)} • ${it.created.toLocaleString()}</div>
-      `;
-
-      const actions = document.createElement('div');
-      actions.className = 'actions';
-      const a = document.createElement('a');
-      a.className = 'btn';
-      a.download = it.name;
-      a.href = it.url;
-      a.textContent = 'Descargar';
-      actions.appendChild(a);
-
-      const del = document.createElement('button');
-      del.className = 'btn';
-      del.textContent = 'Eliminar';
-      del.addEventListener('click', () => {
-        URL.revokeObjectURL(it.url);
-        items.splice(idx,1);
-        render();
-      });
-      actions.appendChild(del);
-
-      body.appendChild(actions);
-      card.appendChild(body);
-      gallery.appendChild(card);
-    });
-    countEl.textContent = items.length;
+/* =========================
+   Publicar
+   ========================= */
+form.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const pub = {
+    producto: document.getElementById("nombreProducto").value.trim(),
+    precio: document.getElementById("precioProducto").value.trim(),
+    vendedor: document.getElementById("nombreVendedor").value.trim(),
+    telefono: document.getElementById("telefono").value.trim(),
+    descripcion: document.getElementById("descripcionProducto").value.trim(),
+    media: [], // se llenará con IDs tras guardar blobs
+    ts: Date.now()
+  };
+  if(!pub.producto || !pub.precio || !pub.vendedor){
+    statusEl.textContent = "Completa producto, precio y vendedor."; return;
   }
+  // Guardar blobs en IndexedDB
+  for(const m of pendingMedia){
+    const rec = { id:id(), type:m.type, name:m.name, blob:m.blob };
+    try{
+      const mid = await putMedia(rec);
+      pub.media.push({ id: mid, type: m.type, name: m.name });
+    }catch(err){ console.error("Error guardando media", err); }
+  }
+  // Guardar post en localStorage
+  const list = loadPosts();
+  list.unshift(pub); savePosts(list);
+  // Reset
+  pendingMedia = []; refreshChips();
+  form.reset(); statusEl.textContent = "Publicado.";
+  render(list);
+});
 
-  /*** Inicio ***/
-  if ('mediaDevices' in navigator) startCamera();
-  else alert('Tu navegador no soporta cámara (getUserMedia).');
-
+/* =========================
+   Inicio
+   ========================= */
+(async function start(){
+  await openDB();
+  render(loadPosts());
+  if("mediaDevices" in navigator){ startCamera(); }
 })();
 </script>
 </body>
