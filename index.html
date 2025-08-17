@@ -3,40 +3,79 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Baguet — Red social local (PocketBase)</title>
-
+<title>Baguet — Red social local</title>
 <meta name="description" content="Publicaciones en tiempo real con PocketBase.">
-<style>
-  :root{ --nav:#0c1320; --brand1:#2563eb; --brand2:#6d28d9; --accent:#10b981;
-         --ink:#0f1720; --muted:#6b7280; --bg:#f5f7fb; --surface:#fff; --radius:14px;
-         --shadow:0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06); }
-  *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:var(--ink);background:var(--bg)}
-  .nav{position:sticky;top:0;z-index:40;background:var(--nav);color:#e5eef7;border-bottom:1px solid rgba(255,255,255,.06)}
-  .nav-inner{max-width:1120px;margin:auto;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
-  .brand{display:flex;gap:10px;align-items:center}
-  .brand img{width:36px;height:36px;border-radius:8px;object-fit:cover;background:#fff}
-  .brand b{display:block;font-size:16px}
-  .brand span{font-size:11px;opacity:.85;letter-spacing:1px}
-  .btn{appearance:none;border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
-  .btn-primary{background:linear-gradient(180deg,var(--brand1),var(--brand2));color:#fff;box-shadow:var(--shadow)}
-  .btn-small{padding:6px 10px;border:1px solid #c9cccf;background:#fff;border-radius:10px;cursor:pointer}
-  .container{max-width:1120px;margin:26px auto;padding:0 16px}
-  .surface{background:#fff;border:1px solid #e8ebf3;border-radius:var(--radius);box-shadow:var(--shadow)}
-  form.surface{padding:18px;margin-bottom:18px}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media (max-width:720px){.grid-2{grid-template-columns:1fr}}
-  label{display:block;font-size:13px;color:#475569;margin:2px 0 6px}
-  input[type="text"],input[type="number"],input[type="tel"],textarea{width:100%;padding:12px;border:1px solid #cfd5e1;border-radius:10px;font-size:14px;background:#fff}
-  input:focus,textarea:focus{outline:none;border-color:#9ac5ff;box-shadow:0 0 0 3px rgba(37,99,235,.16)}
-  textarea{resize:vertical;min-height:84px}
 
-  /* === NUEVO: captura y adjuntos múltiples === */
-  .media-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:10px}
+<style>
+  :root{
+    --bg:#0b0f14;             /* fondo marco */
+    --page:#f6f7fb;           /* fondo contenido */
+    --ink:#0f1720;
+    --muted:#64748b;
+
+    --brand1:#2563eb;
+    --brand2:#7c3aed;
+    --ok:#10b981;
+    --danger:#ef4444;
+
+    --surface:#ffffff;
+    --border:#e7eaf1;
+
+    --radius:14px;
+    --shadow:0 2px 8px rgba(16,24,40,.06), 0 12px 30px rgba(2,6,23,.10);
+    --shadow-soft:0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--page);color:var(--ink)}
+
+  /* ---------- Topbar ---------- */
+  .topbar{position:sticky;top:0;z-index:80;background:#0e1626;color:#d7e7ff;border-bottom:1px solid rgba(255,255,255,.06)}
+  .tb-inner{max-width:1200px;margin:auto;padding:10px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
+  .brand{display:flex;gap:10px;align-items:center}
+  .brand img{width:40px;height:40px;border-radius:10px;background:#fff;object-fit:cover}
+  .brand .t b{display:block;letter-spacing:.3px}
+  .brand .t small{opacity:.85;letter-spacing:1px}
+  .tb-actions{display:flex;gap:10px}
+  .btn{appearance:none;border:1px solid rgba(255,255,255,.25);background:transparent;color:#e5eef7;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}
+  .btn:hover{border-color:#fff}
+  .btn-primary{border:none;background:linear-gradient(180deg,var(--brand1),var(--brand2));color:#fff;box-shadow:var(--shadow)}
+
+  /* ---------- Subnav ---------- */
+  .subnav{position:sticky;top:62px;z-index:70;background:rgba(255,255,255,.6);backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
+  .sn-inner{max-width:1200px;margin:auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+  .tab{padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;color:#111;font-weight:700;text-decoration:none}
+  .tab.primary{border-color:#cfe0ff;background:#eef5ff}
+
+  /* ---------- Layout ---------- */
+  .container{max-width:1200px;margin:20px auto;padding:0 16px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:980px){.grid-2{grid-template-columns:1fr}}
+
+  /* ---------- Surfaces ---------- */
+  .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card-body{padding:16px}
+  .card-title{margin:0 0 10px;font-size:18px}
+
+  /* ---------- Form ---------- */
+  label{display:block;font-size:13px;color:#475569;margin:2px 0 6px}
+  input[type="text"],input[type="number"],input[type="tel"],textarea{
+    width:100%;padding:12px;border:1px solid #cfd5e1;border-radius:10px;background:#fff;font-size:14px;outline:none
+  }
+  input:focus,textarea:focus{border-color:#9ac5ff;box-shadow:0 0 0 3px rgba(37,99,235,.16)}
+  textarea{resize:vertical;min-height:84px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:720px){.row{grid-template-columns:1fr}}
+  .muted{color:var(--muted);font-size:13px}
+
+  /* ---------- Composer media ---------- */
+  .media-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}
   @media (max-width:900px){.media-grid{grid-template-columns:1fr}}
-  .box{border:1px dashed #cfd5e1;border-radius:12px;padding:12px;background:#f8fafc}
+  .box{border:1px dashed #cfd5e1;border-radius:12px;background:#fafcff;padding:12px}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
   .chip{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;border:1px solid #c9d3e5;background:#fff;font-size:12px}
-  .chip button{border:none;background:transparent;color:#ef4444;cursor:pointer}
+  .chip button{border:none;background:transparent;color:var(--danger);cursor:pointer}
   .live-wrap{border-radius:12px;overflow:hidden;background:#000}
   #live{width:100%;height:auto;display:block}
   .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
@@ -44,439 +83,443 @@
   .btn-s.primary{border:none;background:linear-gradient(180deg,var(--brand1),var(--brand2));color:#fff}
   #recHint{font-size:12px;color:#dc2626}
 
-  .list-header{display:flex;align-items:center;gap:8px;margin:22px 0 12px}
-  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;font-size:12px;font-weight:700;border-radius:999px;color:#033;background:#d5efe9;border:1px solid #b6e0d6}
-  .grid-cards{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
-  @media (max-width:980px){.grid-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media (max-width:640px){.grid-cards{grid-template-columns:1fr}}
-  .card{background:#fff;border:1px solid #e8ebf3;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-  .card img{width:100%;height:190px;object-fit:cover;display:block}
-  .card .body{padding:14px}
-  .card h3{margin:0 0 6px 0;font-size:16px}
-  .muted{color:var(--muted);font-size:13px}
-  .price{font-weight:800;margin:6px 0}
-  .row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .link, .btn-like, .btn-small{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid #c9cccf;background:#fff;cursor:pointer;text-decoration:none;color:#111;font-weight:700;font-size:13px}
-  .btn-like.liked{border-color:#99c9ff;background:#eef5ff}
-  .comments{border-top:1px solid #eef0f4;margin-top:10px;padding-top:10px}
-  .comment{padding:8px 10px;border:1px solid #eef0f4;border-radius:10px;margin:6px 0;background:#fafbff}
-  .media-strip{display:flex;gap:8px;overflow:auto;padding:8px;background:#fafafa;border-top:1px solid #eef0f4}
+  /* ---------- Feed ---------- */
+  .toolbar{display:flex;gap:10px;align-items:center;margin:14px 0}
+  .search{flex:1;padding:10px 12px;border:1px solid #cfd5e1;border-radius:10px}
+  .feed{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
+  @media (max-width:980px){.feed{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:640px){.feed{grid-template-columns:1fr}}
+
+  .post img.cover{width:100%;height:200px;object-fit:cover;display:block;border-bottom:1px solid var(--border)}
+  .media-strip{display:flex;gap:8px;overflow:auto;padding:8px;background:#fafafa;border-top:1px solid var(--border)}
   .media-strip img,.media-strip video{width:160px;height:120px;object-fit:cover;border-radius:10px;border:1px solid #e1e4ea;background:#f1f3f7}
-  .comment small{color:#64748b}
+
+  .row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .btn-like,.link,.btn-small{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid #c9cccf;background:#fff;cursor:pointer;text-decoration:none;color:#111;font-weight:700;font-size:13px}
+  .btn-like.liked{border-color:#99c9ff;background:#eef5ff}
+
+  .comments{border-top:1px solid var(--border);margin-top:10px;padding-top:10px}
+  .comment{padding:8px 10px;border:1px solid var(--border);border-radius:10px;margin:6px 0;background:#fafbff}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;font-size:12px;font-weight:700;border-radius:999px;color:#033;background:#d5efe9;border:1px solid #b6e0d6}
 </style>
 </head>
 <body>
-<!-- NAV -->
-<div class="nav">
-  <div class="nav-inner">
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="tb-inner">
     <div class="brand">
-      <img src="logo-baguet.png" alt="Baguet"><div><b>BAGUET</b><span>LOJA</span></div>
+      <img src="logo-baguet.png" alt="Baguet" />
+      <div class="t"><b>BAGUET</b><small>LOJA</small></div>
     </div>
     <div></div>
-    <div><a class="btn btn-primary" href="#publicar">Publicar</a></div>
+    <div class="tb-actions">
+      <a class="btn" href="#feed">Explorar</a>
+      <a class="btn btn-primary" href="#composer">Publicar</a>
+    </div>
   </div>
-</div>
+</header>
+
+<!-- SUBNAV -->
+<nav class="subnav">
+  <div class="sn-inner">
+    <a class="tab primary" href="#composer">Publicar</a>
+    <a class="tab" href="#feed">Listado</a>
+  </div>
+</nav>
 
 <main class="container">
-  <!-- Form publicar -->
-  <form id="postForm" class="surface" autocomplete="off">
-    <div class="grid-2">
-      <div><label> Sala </label><input id="room" type="text" placeholder="loja" /></div>
-      <div><label> Tu nombre </label><input id="author" type="text" required placeholder="Tu nombre" /></div>
-      <div><label> Título / producto </label><input id="title" type="text" required placeholder="Ej. Pan artesanal" /></div>
-      <div><label> Precio (USD) </label><input id="price" type="number" step="0.01" min="0" required placeholder="1.50" /></div>
-      <div><label> WhatsApp </label><input id="phone" type="tel" placeholder="+593..." /></div>
-    </div>
-    <div style="margin-top:10px">
-      <label>Descripción</label><textarea id="description" rows="3" placeholder="Detalles, punto de entrega, etc."></textarea>
-    </div>
 
-    <!-- === NUEVO: Adjuntar múltiples + Cámara === -->
-    <div class="media-grid">
-      <div class="box">
-        <label>Subir fotos y videos (múltiples)</label>
-        <input id="mediaInput" type="file" accept="image/*,video/*" multiple />
-        <div class="muted" style="margin-top:6px">Las fotos se optimizan antes de subir; los videos se envían tal cual.</div>
-        <div id="chips" class="chips"></div>
-      </div>
-      <div class="box">
-        <label>Cámara (foto / video)</label>
-        <div class="live-wrap"><video id="live" playsinline autoplay muted></video></div>
-        <div class="controls">
-          <button class="btn-s" id="toggleFacing" type="button">Cambiar cámara</button>
-          <button class="btn-s primary" id="takePhoto" type="button">Tomar foto</button>
-          <button class="btn-s" id="startRec" type="button">Grabar video</button>
-          <button class="btn-s" id="stopRec" type="button" disabled>Detener</button>
-          <span class="muted" id="recHint">–</span>
+  <!-- COMPOSER -->
+  <section id="composer" class="card">
+    <div class="card-body">
+      <h3 class="card-title">Crear publicación</h3>
+
+      <form id="postForm" autocomplete="off">
+        <div class="row">
+          <div>
+            <label>Sala</label>
+            <input id="room" type="text" placeholder="loja">
+          </div>
+          <div>
+            <label>Tu nombre</label>
+            <input id="author" type="text" required placeholder="Tu nombre">
+          </div>
+          <div>
+            <label>Título / producto</label>
+            <input id="title" type="text" required placeholder="Ej. Pan artesanal">
+          </div>
+          <div>
+            <label>Precio (USD)</label>
+            <input id="price" type="number" step="0.01" min="0" required placeholder="1.50">
+          </div>
+          <div>
+            <label>WhatsApp</label>
+            <input id="phone" type="tel" placeholder="+593...">
+          </div>
+          <div>
+            <label>Descripción</label>
+            <textarea id="description" rows="3" placeholder="Detalles, punto de entrega, etc."></textarea>
+          </div>
         </div>
-      </div>
-    </div>
-    <!-- === /NUEVO === -->
 
-    <div style="display:flex;gap:10px;margin-top:14px">
-      <button class="btn btn-primary" type="submit">Publicar</button>
-      <span class="muted" id="status"></span>
-    </div>
-  </form>
+        <!-- MEDIA -->
+        <div class="media-grid">
+          <div class="box">
+            <label>Subir fotos y videos (múltiples)</label>
+            <input id="mediaInput" type="file" accept="image/*,video/*" multiple />
+            <div class="muted" style="margin-top:6px">Las fotos se optimizan; los videos se envían tal cual.</div>
+            <div id="chips" class="chips"></div>
+          </div>
+          <div class="box">
+            <label>Cámara (foto / video)</label>
+            <div class="live-wrap"><video id="live" playsinline autoplay muted></video></div>
+            <div class="controls">
+              <button type="button" class="btn-s" id="toggleFacing">Cambiar cámara</button>
+              <button type="button" class="btn-s primary" id="takePhoto">Tomar foto</button>
+              <button type="button" class="btn-s" id="startRec">Grabar video</button>
+              <button type="button" class="btn-s" id="stopRec" disabled>Detener</button>
+              <span class="muted" id="recHint">–</span>
+            </div>
+          </div>
+        </div>
 
-  <!-- Feed -->
-  <div class="list-header">
-    <h2 style="margin:0">Publicaciones</h2>
+        <div class="row" style="margin-top:12px">
+          <div>
+            <button class="btn btn-primary" type="submit">Publicar</button>
+            <span id="status" class="muted" style="margin-left:8px"></span>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- FEED TOOLBAR -->
+  <section class="toolbar" style="margin-top:18px">
+    <input id="q" class="search" type="search" placeholder="Buscar por título o autor…">
     <span class="badge" id="count">0</span>
-  </div>
-  <section id="feed" class="grid-cards"></section>
+  </section>
+
+  <!-- FEED -->
+  <section id="feed" class="feed"></section>
 </main>
 
-<!-- PocketBase JS SDK -->
+<!-- PocketBase SDK -->
 <script src="https://unpkg.com/pocketbase/dist/pocketbase.umd.js"></script>
 <script>
-  /******** CONFIG ********/
-  const PB_URL = location.origin; // si sirves desde otro host: 'http://127.0.0.1:8090'
-  const pb = new PocketBase(PB_URL);
+/* ========= CONFIG & REFS ========= */
+const PB_URL = location.origin; // Cambia si sirves desde otro host
+const pb = new PocketBase(PB_URL);
+const $ = (id)=>document.getElementById(id);
 
-  /******** Helpers ********/
-  const $ = (id)=>document.getElementById(id);
-  const feed = $("feed"), countEl = $("count"), statusEl = $("status");
+const feed = $("feed"), countEl = $("count"), statusEl = $("status");
+const mediaInput = $("mediaInput"), chips = $("chips");
+const live = $("live"), btnFacing = $("toggleFacing"), btnPhoto = $("takePhoto");
+const btnStart = $("startRec"), btnStop = $("stopRec"), recHint = $("recHint");
+const searchBox = $("q");
 
-  // Sala desde ?sala=xxx (por defecto 'loja')
-  const params = new URLSearchParams(location.search);
-  const roomDefault = params.get("sala") || "loja";
-  $("room").value = roomDefault;
+const params = new URLSearchParams(location.search);
+const roomDefault = params.get("sala") || "loja";
+$("room").value = roomDefault;
 
-  // ====== NUEVO: estado de adjuntos y cámara
-  const mediaInput = $("mediaInput"), chips = $("chips");
-  const live = $("live"), btnFacing = $("toggleFacing"),
-        btnPhoto = $("takePhoto"), btnStart = $("startRec"),
-        btnStop = $("stopRec"), recHint = $("recHint");
+/* ========= MEDIA CAPTURE ========= */
+let pendingFiles = []; // File[]
+let stream=null, facing="environment", recorder=null, chunks=[], timer=null, t0=0;
 
-  let pendingFiles = []; // File[]
-  let stream = null, facing = "environment", recorder = null, chunks = [], timer = null, t0 = 0;
+const pad = n => String(n).padStart(2,'0');
+const human = b => (b<1024)? b+' B' : (b<1048576)? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
 
-  const pad = n => String(n).padStart(2,'0');
-  const human = b => (b<1024) ? b+' B' : (b<1048576) ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
+function refreshChips(){
+  chips.innerHTML = pendingFiles.map((f,i)=>(
+    `<span class="chip">${f.type.startsWith('image/')?'🖼️':'🎥'} ${f.name} <small style="color:#64748b">(${human(f.size)})</small>
+      <button type="button" data-remove="${i}" title="Quitar">✕</button>
+    </span>`
+  )).join('');
+}
+chips.addEventListener('click', e=>{
+  const btn = e.target.closest('[data-remove]'); if(!btn) return;
+  pendingFiles.splice(+btn.getAttribute('data-remove'),1); refreshChips();
+});
 
-  function refreshChips(){
-    chips.innerHTML = pendingFiles.map((f,i)=>(
-      `<span class="chip">${f.type.startsWith('image/')?'🖼️':'🎥'} ${f.name} <small style="color:#64748b">(${human(f.size)})</small>
-       <button type="button" data-remove="${i}" title="Quitar">✕</button></span>`
-    )).join('');
-  }
-  chips.addEventListener('click', e=>{
-    const btn = e.target.closest('[data-remove]'); if(!btn) return;
-    const i = +btn.getAttribute('data-remove'); pendingFiles.splice(i,1); refreshChips();
-  });
-
-  // Carga desde archivos
-  mediaInput.addEventListener('change', ()=>{
-    const files = Array.from(mediaInput.files||[]);
-    for(const f of files){
-      if (f.type.startsWith('image/')){
-        // Comprimir a ~1600px de ancho
-        const r = new FileReader();
-        r.onload = e=>{
-          const img = new Image();
-          img.onload = ()=>{
-            const maxW=1600, q=.82, s=Math.min(1, maxW/img.width);
-            const w=Math.round(img.width*s), h=Math.round(img.height*s);
-            const c=document.createElement('canvas'); c.width=w; c.height=h;
-            c.getContext('2d').drawImage(img,0,0,w,h);
-            c.toBlob(b=>{
-              pendingFiles.push(new File([b],'foto_'+Date.now()+'.jpg',{type:'image/jpeg'}));
-              refreshChips();
-            }, 'image/jpeg', q);
-          };
-          img.src = e.target.result;
+mediaInput.addEventListener('change', ()=>{
+  const files = Array.from(mediaInput.files||[]);
+  for(const f of files){
+    if (f.type.startsWith('image/')){
+      const r = new FileReader();
+      r.onload = e=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const maxW = 1600, q = .82, s = Math.min(1, maxW/img.width);
+          const w = Math.round(img.width*s), h = Math.round(img.height*s);
+          const c = document.createElement('canvas'); c.width=w; c.height=h;
+          c.getContext('2d').drawImage(img,0,0,w,h);
+          c.toBlob(b=>{
+            pendingFiles.push(new File([b], 'foto_'+Date.now()+'.jpg', {type:'image/jpeg'}));
+            refreshChips();
+          }, 'image/jpeg', q);
         };
-        r.readAsDataURL(f);
-      }else{
-        pendingFiles.push(f); // video tal cual
-      }
+        img.src = e.target.result;
+      };
+      r.readAsDataURL(f);
+    } else {
+      pendingFiles.push(f);
     }
-    mediaInput.value='';
+  }
+  mediaInput.value = '';
+  refreshChips();
+});
+
+async function startCamera(){
+  try{
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:facing, width:{ideal:1280}, height:{ideal:720} }, audio:true });
+    live.srcObject = stream;
+  }catch(e){ console.error(e); alert('No se pudo abrir la cámara. Revisa permisos.'); }
+}
+if('mediaDevices' in navigator) startCamera();
+
+btnFacing.addEventListener('click', async ()=>{ facing = (facing==='user')?'environment':'user'; await startCamera(); });
+btnPhoto.addEventListener('click', ()=>{
+  if(!stream) return;
+  const track = stream.getVideoTracks()[0], s = track.getSettings();
+  const w = s.width||1280, h = s.height||720;
+  const c = document.createElement('canvas'); c.width=w; c.height=h;
+  c.getContext('2d').drawImage(live,0,0,w,h);
+  c.toBlob(b=>{
+    pendingFiles.push(new File([b],'foto_'+Date.now()+'.jpg',{type:'image/jpeg'}));
     refreshChips();
-  });
+  }, 'image/jpeg', .9);
+});
+btnStart.addEventListener('click', ()=>{
+  if(!stream) return;
+  chunks=[];
+  try{ recorder = new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9,opus'}); }
+  catch{ recorder = new MediaRecorder(stream); }
+  recorder.ondataavailable = e=>{ if(e.data.size>0) chunks.push(e.data); };
+  recorder.onstop = ()=>{
+    const blob = new Blob(chunks, { type: recorder.mimeType || 'video/webm' });
+    pendingFiles.push(new File([blob],'video_'+Date.now()+'.webm',{type:blob.type}));
+    refreshChips(); clearInterval(timer); recHint.textContent='–';
+  };
+  recorder.start();
+  t0 = Date.now();
+  timer = setInterval(()=>{ const s = Math.floor((Date.now()-t0)/1000); recHint.textContent=`Grabando ${pad(Math.floor(s/60))}:${pad(s%60)}`; }, 500);
+  btnStart.disabled=true; btnStop.disabled=false;
+});
+btnStop.addEventListener('click', ()=>{ if(recorder && recorder.state!=='inactive') recorder.stop(); btnStart.disabled=false; btnStop.disabled=true; });
 
-  // Cámara
-  async function startCamera(){
-    try{
-      if(stream) stream.getTracks().forEach(t=>t.stop());
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:facing, width:{ideal:1280}, height:{ideal:720} }, audio:true });
-      live.srcObject = stream;
-    }catch(e){ console.error(e); alert('No se pudo abrir la cámara. Revisa permisos.'); }
+/* ========= AUTH Invitado ========= */
+async function ensureGuest(){
+  const kU='pb_u', kP='pb_p';
+  let u=localStorage.getItem(kU), p=localStorage.getItem(kP);
+  try{ if(u && p){ await pb.collection('users').authWithPassword(u,p); return; } }catch{}
+  u = "guest_" + Math.random().toString(36).slice(2,10);
+  p = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  await pb.collection('users').create({ username:u, password:p, passwordConfirm:p, name:u });
+  await pb.collection('users').authWithPassword(u,p);
+  localStorage.setItem(kU,u); localStorage.setItem(kP,p);
+}
+
+/* ========= FEED ========= */
+const posts = new Map();
+const likeSubs = new Map();
+const commentSubs = new Map();
+
+function isVideoName(name=''){ return /\.(mp4|mov|webm|m4v|avi)$/i.test(name); }
+function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+
+function postCard(rec){
+  const el=document.createElement('article'); el.className='card post'; el.id='post-'+rec.id;
+
+  if(rec.image){
+    const cover = pb.files.getUrl(rec, rec.image, { thumb:'900x0' });
+    const img = document.createElement('img'); img.className='cover'; img.src=cover; img.alt=rec.title; el.appendChild(img);
   }
-  if('mediaDevices' in navigator) startCamera();
-
-  btnFacing.addEventListener('click', async ()=>{ facing = (facing==='user')?'environment':'user'; await startCamera(); });
-
-  btnPhoto.addEventListener('click', ()=>{
-    if(!stream) return;
-    const track = stream.getVideoTracks()[0], s = track.getSettings();
-    const w = s.width || 1280, h = s.height || 720;
-    const c = document.createElement('canvas'); c.width=w; c.height=h;
-    c.getContext('2d').drawImage(live,0,0,w,h);
-    c.toBlob(b=>{
-      pendingFiles.push(new File([b],'foto_'+Date.now()+'.jpg',{type:'image/jpeg'}));
-      refreshChips();
-    }, 'image/jpeg', .9);
-  });
-
-  btnStart.addEventListener('click', ()=>{
-    if(!stream) return;
-    chunks=[];
-    try{ recorder = new MediaRecorder(stream, { mimeType:'video/webm;codecs=vp9,opus' }); }
-    catch{ recorder = new MediaRecorder(stream); }
-    recorder.ondataavailable = e=>{ if(e.data.size>0) chunks.push(e.data); };
-    recorder.onstop = ()=>{
-      const blob = new Blob(chunks, { type: recorder.mimeType || 'video/webm' });
-      pendingFiles.push(new File([blob],'video_'+Date.now()+'.webm',{type: blob.type}));
-      refreshChips();
-      clearInterval(timer); recHint.textContent='–';
-    };
-    recorder.start();
-    t0 = Date.now();
-    timer = setInterval(()=>{ const s = Math.floor((Date.now()-t0)/1000); recHint.textContent = `Grabando ${pad(Math.floor(s/60))}:${pad(s%60)}`; },500);
-    btnStart.disabled=true; btnStop.disabled=false;
-  });
-  btnStop.addEventListener('click', ()=>{ if(recorder && recorder.state!=='inactive') recorder.stop(); btnStart.disabled=false; btnStop.disabled=true; });
-
-  /******** Auth “invitado” automático ********/
-  async function ensureGuest(){
-    const kU='pb_u', kP='pb_p';
-    let u=localStorage.getItem(kU), p=localStorage.getItem(kP);
-    try{ if(u && p){ await pb.collection('users').authWithPassword(u,p); return; } }catch{}
-    u = "guest_" + Math.random().toString(36).slice(2,10);
-    p = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-    await pb.collection('users').create({ username:u, password:p, passwordConfirm:p, name:u });
-    await pb.collection('users').authWithPassword(u,p);
-    localStorage.setItem(kU,u); localStorage.setItem(kP,p);
-  }
-
-  /******** Render ********/
-  const posts = new Map();
-  const likeSubs = new Map();
-  const commentSubs = new Map();
-
-  function isVideoName(name=''){ return /\.(mp4|mov|webm|m4v|avi)$/i.test(name); }
-  function postCard(rec){
-    const el = document.createElement('article'); el.className='card'; el.id='post-'+rec.id;
-
-    // Portada (image) si existe
-    if(rec.image){
-      const cover = pb.files.getUrl(rec, rec.image, { thumb:'800x0' });
-      const img = document.createElement('img'); img.src=cover; img.alt=rec.title; el.appendChild(img);
-    }
-
-    // Tira de medios múltiples
-    if (Array.isArray(rec.media) && rec.media.length){
-      const strip = document.createElement('div'); strip.className='media-strip';
-      rec.media.forEach(name=>{
-        const url = pb.files.getUrl(rec, name);
-        if (isVideoName(name)){
-          const v=document.createElement('video'); v.src=url; v.controls=true; v.playsInline=true; strip.appendChild(v);
-        }else{
-          const i=document.createElement('img'); i.src=url; i.alt=name; strip.appendChild(i);
-        }
-      });
-      el.appendChild(strip);
-    }
-
-    const body=document.createElement('div'); body.className='body';
-    body.innerHTML = `
-      <h3>${esc(rec.title)}</h3>
-      <div class="muted">Por ${esc(rec.author||'Anónimo')} • ${new Date(rec.created).toLocaleString()}</div>
-      <div class="price">$${Number(rec.price||0).toFixed(2)}</div>
-      ${rec.description ? `<p class="muted" style="margin:6px 0 0">${esc(rec.description)}</p>` : ""}
-    `;
-    const actions=document.createElement('div'); actions.className='row-actions';
-    const likeBtn=document.createElement('button'); likeBtn.className='btn-like'; likeBtn.setAttribute('data-like', rec.id);
-    likeBtn.innerHTML = `❤️ <span data-likecount="${rec.id}">0</span>`;
-    actions.appendChild(likeBtn);
-
-    const tel=(rec.phone||"").replace(/[^0-9+]/g,'');
-    if (tel){
-      const a1=document.createElement('a'); a1.className='link'; a1.target='_blank';
-      a1.href=`https://wa.me/${tel}?text=${encodeURIComponent("Hola, me interesa: "+rec.title)}`; a1.textContent='WhatsApp';
-      const a2=document.createElement('a'); a2.className='link'; a2.href=`tel:${tel}`; a2.textContent='Llamar';
-      actions.appendChild(a1); actions.appendChild(a2);
-    }
-    const cBtn=document.createElement('button'); cBtn.className='btn-small'; cBtn.textContent='Comentarios';
-    cBtn.setAttribute('data-comments-toggle', rec.id);
-    actions.appendChild(cBtn);
-
-    const me = pb.authStore.model;
-    if (me && rec.user === me.id){
-      const del=document.createElement('button'); del.className='btn-small'; del.style.background='#ef4444'; del.style.color='#fff';
-      del.textContent='Eliminar'; del.setAttribute('data-del', rec.id);
-      actions.appendChild(del);
-    }
-
-    const cWrap=document.createElement('div'); cWrap.className='comments'; cWrap.id=`comments-${rec.id}`; cWrap.style.display='none';
-    cWrap.innerHTML = `
-      <div id="comments-list-${rec.id}"></div>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <input type="text" id="comment-input-${rec.id}" placeholder="Escribe un comentario..." style="flex:1;padding:10px;border:1px solid #cfd5e1;border-radius:10px">
-        <button class="btn-small" data-send="${rec.id}">Enviar</button>
-      </div>`;
-
-    body.appendChild(actions); body.appendChild(cWrap); el.appendChild(body);
-    return el;
-  }
-  function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
-
-  function render(){
-    feed.innerHTML="";
-    const arr = Array.from(posts.values()).sort((a,b)=> new Date(b.created) - new Date(a.created));
-    arr.forEach(r=>{ feed.appendChild(postCard(r)); initLikesFor(r.id); });
-    countEl.textContent = arr.length;
-  }
-
-  async function initLikesFor(postId){
-    try {
-      const res = await pb.collection('likes').getList(1, 1, { filter: `post="${postId}"` });
-      const n = res.totalItems||0;
-      const node = document.querySelector(`[data-likecount="${postId}"]`);
-      if (node) node.textContent = n;
-    } catch {}
-    if (likeSubs.has(postId)) return;
-    const unsub = await pb.collection('likes').subscribe(`post="${postId}"`, e=>{
-      pb.collection('likes').getList(1,1,{ filter:`post="${postId}"` }).then(res=>{
-        const node = document.querySelector(`[data-likecount="${postId}"]`);
-        if (node) node.textContent = res.totalItems||0;
-      });
+  if(Array.isArray(rec.media) && rec.media.length){
+    const strip=document.createElement('div'); strip.className='media-strip';
+    rec.media.forEach(name=>{
+      const url = pb.files.getUrl(rec, name);
+      if(isVideoName(name)){ const v=document.createElement('video'); v.src=url; v.controls=true; v.playsInline=true; strip.appendChild(v); }
+      else { const i=document.createElement('img'); i.src=url; i.alt=name; strip.appendChild(i); }
     });
-    likeSubs.set(postId, unsub);
+    el.appendChild(strip);
   }
 
-  /******** Cargar & suscribirse a posts por sala ********/
-  async function loadRoom(room){
-    const list = await pb.collection('posts').getFullList({ sort: '-created', filter: `room = "${room}"` });
-    posts.clear(); list.forEach(r=>posts.set(r.id, r)); render();
-    if (window._postsUnsub) { await window._postsUnsub(); }
-    window._postsUnsub = await pb.collection('posts').subscribe(`room="${room}"`, e=>{
-      const r = e.record;
-      if (e.action === 'create' || e.action === 'update') { posts.set(r.id, r); }
-      if (e.action === 'delete') { posts.delete(r.id); }
-      render();
+  const body=document.createElement('div'); body.className='card-body';
+  body.innerHTML=`
+    <h3 style="margin:0 0 6px">${esc(rec.title)}</h3>
+    <div class="muted">Por ${esc(rec.author||'Anónimo')} • ${new Date(rec.created).toLocaleString()}</div>
+    <div class="price">$${Number(rec.price||0).toFixed(2)}</div>
+    ${rec.description ? `<p class="muted" style="margin:6px 0 0">${esc(rec.description)}</p>` : ""}
+  `;
+  const actions=document.createElement('div'); actions.className='row-actions';
+  const likeBtn=document.createElement('button'); likeBtn.className='btn-like'; likeBtn.setAttribute('data-like', rec.id);
+  likeBtn.innerHTML=`❤️ <span data-likecount="${rec.id}">0</span>`;
+  actions.appendChild(likeBtn);
+
+  const tel=(rec.phone||"").replace(/[^0-9+]/g,'');
+  if(tel){
+    const wa=document.createElement('a'); wa.className='link'; wa.target='_blank';
+    wa.href=`https://wa.me/${tel}?text=${encodeURIComponent("Hola, me interesa: "+rec.title)}`; wa.textContent='WhatsApp';
+    const call=document.createElement('a'); call.className='link'; call.href=`tel:${tel}`; call.textContent='Llamar';
+    actions.appendChild(wa); actions.appendChild(call);
+  }
+
+  const cBtn=document.createElement('button'); cBtn.className='btn-small'; cBtn.textContent='Comentarios'; cBtn.setAttribute('data-comments-toggle', rec.id);
+  actions.appendChild(cBtn);
+
+  const me=pb.authStore.model;
+  if(me && rec.user===me.id){
+    const del=document.createElement('button'); del.className='btn-small'; del.style.background= '#ef4444'; del.style.color='#fff';
+    del.textContent='Eliminar'; del.setAttribute('data-del', rec.id);
+    actions.appendChild(del);
+  }
+
+  const cWrap=document.createElement('div'); cWrap.className='comments'; cWrap.id=`comments-${rec.id}`; cWrap.style.display='none';
+  cWrap.innerHTML=`
+    <div id="comments-list-${rec.id}"></div>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <input type="text" id="comment-input-${rec.id}" placeholder="Escribe un comentario..." style="flex:1;padding:10px;border:1px solid #cfd5e1;border-radius:10px">
+      <button class="btn-small" data-send="${rec.id}">Enviar</button>
+    </div>
+  `;
+
+  body.appendChild(actions); body.appendChild(cWrap); el.appendChild(body);
+  return el;
+}
+
+function render(){
+  feed.innerHTML="";
+  const term = (searchBox.value||'').toLowerCase().trim();
+  const arr = Array.from(posts.values())
+    .filter(r => !term || (r.title||'').toLowerCase().includes(term) || (r.author||'').toLowerCase().includes(term))
+    .sort((a,b)=> new Date(b.created)-new Date(a.created));
+  arr.forEach(r=>{ feed.appendChild(postCard(r)); initLikesFor(r.id); });
+  countEl.textContent = arr.length;
+}
+searchBox.addEventListener('input', render);
+
+async function initLikesFor(postId){
+  try{
+    const res=await pb.collection('likes').getList(1,1,{filter:`post="${postId}"`});
+    const n=res.totalItems||0; const node=document.querySelector(`[data-likecount="${postId}"]`);
+    if(node) node.textContent=n;
+  }catch{}
+  if(likeSubs.has(postId)) return;
+  const unsub=await pb.collection('likes').subscribe(`post="${postId}"`, e=>{
+    pb.collection('likes').getList(1,1,{filter:`post="${postId}"`}).then(res=>{
+      const node=document.querySelector(`[data-likecount="${postId}"]`);
+      if(node) node.textContent = res.totalItems||0;
     });
-  }
+  });
+  likeSubs.set(postId,unsub);
+}
 
-  /******** Eventos del feed (likes / comentarios / borrar) ********/
-  feed.addEventListener('click', async (ev)=>{
-    const like = ev.target.closest('[data-like]');
-    if (like){
-      const postId = like.getAttribute('data-like');
-      const me = pb.authStore.model;
-      if (!me){ alert('Autenticando… recarga la página.'); return; }
-      const existing = await safeGetFirst('likes', `post="${postId}" && user="${me.id}"`);
-      if (existing){ await pb.collection('likes').delete(existing.id); }
-      else { await pb.collection('likes').create({ post: postId, user: me.id }); }
-      return;
-    }
-    const tog = ev.target.closest('[data-comments-toggle]');
-    if (tog){
-      const postId = tog.getAttribute('data-comments-toggle');
-      const box = $("comments-"+postId);
-      if (box.style.display === 'none'){ box.style.display='block'; openComments(postId); }
-      else { box.style.display='none'; closeComments(postId); }
-      return;
-    }
-    const send = ev.target.closest('[data-send]');
-    if (send){
-      const postId = send.getAttribute('data-send');
-      const inp = $("comment-input-"+postId);
-      const text = (inp.value||'').trim(); if (!text) return;
-      const me = pb.authStore.model;
-      await pb.collection('comments').create({
-        post: postId, user: me.id, name: (document.getElementById('author').value || me.username || 'Anónimo'), text
-      });
-      inp.value = '';
-      return;
-    }
-    const del = ev.target.closest('[data-del]');
-    if (del){
-      const postId = del.getAttribute('data-del');
-      if (!confirm('¿Eliminar tu publicación?')) return;
-      await pb.collection('posts').delete(postId);
-      return;
+/* cargar por sala + RT */
+async function loadRoom(room){
+  const list=await pb.collection('posts').getFullList({sort:'-created', filter:`room="${room}"`});
+  posts.clear(); list.forEach(r=>posts.set(r.id,r)); render();
+  if(window._postsUnsub) await window._postsUnsub();
+  window._postsUnsub = await pb.collection('posts').subscribe(`room="${room}"`, e=>{
+    const r=e.record;
+    if(e.action==='create'||e.action==='update') posts.set(r.id,r);
+    if(e.action==='delete') posts.delete(r.id);
+    render();
+  });
+}
+
+/* feed actions */
+feed.addEventListener('click', async (ev)=>{
+  const like=ev.target.closest('[data-like]');
+  if(like){
+    const postId=like.getAttribute('data-like'); const me=pb.authStore.model;
+    if(!me){ alert('Autenticando…'); return; }
+    const existing = await safeGetFirst('likes', `post="${postId}" && user="${me.id}"`);
+    if(existing) await pb.collection('likes').delete(existing.id);
+    else await pb.collection('likes').create({post:postId, user:me.id});
+    return;
+  }
+  const tog=ev.target.closest('[data-comments-toggle]');
+  if(tog){
+    const postId=tog.getAttribute('data-comments-toggle');
+    const box=$("comments-"+postId);
+    if(box.style.display==='none'){ box.style.display='block'; openComments(postId); }
+    else { box.style.display='none'; closeComments(postId); }
+    return;
+  }
+  const send=ev.target.closest('[data-send]');
+  if(send){
+    const postId=send.getAttribute('data-send');
+    const inp=$("comment-input-"+postId); const text=(inp.value||'').trim(); if(!text) return;
+    const me=pb.authStore.model;
+    await pb.collection('comments').create({post:postId, user:me.id, name:($("author").value||me.username||'Anónimo'), text});
+    inp.value=''; return;
+  }
+  const del=ev.target.closest('[data-del]');
+  if(del){
+    const postId=del.getAttribute('data-del');
+    if(!confirm('¿Eliminar tu publicación?')) return;
+    await pb.collection('posts').delete(postId);
+  }
+});
+async function openComments(postId){
+  const wrap=$("comments-list-"+postId); wrap.innerHTML="";
+  const rows=await pb.collection('comments').getFullList({sort:'-created', filter:`post="${postId}"`});
+  rows.forEach(c=>{
+    const item=document.createElement('div'); item.className='comment';
+    item.innerHTML=`<div><strong>${esc(c.name||'Anónimo')}</strong> <small>${new Date(c.created).toLocaleString()}</small></div><div>${esc(c.text||'')}</div>`;
+    wrap.appendChild(item);
+  });
+  if(commentSubs.has(postId)) return;
+  const unsub=await pb.collection('comments').subscribe(`post="${postId}"`, e=>{
+    if(e.action==='create'){
+      const c=e.record;
+      const item=document.createElement('div'); item.className='comment';
+      item.innerHTML=`<div><strong>${esc(c.name||'Anónimo')}</strong> <small>${new Date(c.created).toLocaleString()}</small></div><div>${esc(c.text||'')}</div>`;
+      wrap.prepend(item);
     }
   });
+  commentSubs.set(postId,unsub);
+}
+async function closeComments(postId){ const u=commentSubs.get(postId); if(u){ await u(); commentSubs.delete(postId); } }
+async function safeGetFirst(col, filter){ try{ return await pb.collection(col).getFirstListItem(filter); }catch{ return null; } }
 
-  async function openComments(postId){
-    const wrap = $("comments-list-"+postId);
-    wrap.innerHTML = "";
-    const rows = await pb.collection('comments').getFullList({ sort: '-created', filter: `post="${postId}"` });
-    rows.forEach(c=>{
-      const item=document.createElement('div');
-      item.className='comment';
-      item.innerHTML = `<div><strong>${esc(c.name||'Anónimo')}</strong> <small>${new Date(c.created).toLocaleString()}</small></div><div>${esc(c.text||'')}</div>`;
-      wrap.appendChild(item);
-    });
-    if (commentSubs.has(postId)) return;
-    const unsub = await pb.collection('comments').subscribe(`post="${postId}"`, e=>{
-      if (e.action === 'create'){
-        const c=e.record;
-        const item=document.createElement('div');
-        item.className='comment';
-        item.innerHTML = `<div><strong>${esc(c.name||'Anónimo')}</strong> <small>${new Date(c.created).toLocaleString()}</small></div><div>${esc(c.text||'')}</div>`;
-        wrap.prepend(item);
-      }
-    });
-    commentSubs.set(postId, unsub);
-  }
-  async function closeComments(postId){
-    const u = commentSubs.get(postId);
-    if (u){ await u(); commentSubs.delete(postId); }
-  }
-  async function safeGetFirst(col, filter){
-    try { return await pb.collection(col).getFirstListItem(filter); } catch { return null; }
-  }
+/* ========= PUBLICAR ========= */
+$("postForm").addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const me=pb.authStore.model;
+  const room=($("room").value||"loja").trim();
+  const title=$("title").value.trim();
+  const price=$("price").value;
+  const author=$("author").value.trim() || (me?.username ?? 'Anónimo');
+  const phone=$("phone").value.trim();
+  const description=$("description").value.trim();
 
-  /******** Publicar (con múltiples medios) ********/
-  $("postForm").addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    const me = pb.authStore.model;
-    const room = ($("room").value || "loja").trim();
-    const title = $("title").value.trim();
-    const price = $("price").value;
-    const author = $("author").value.trim() || (me?.username ?? 'Anónimo');
-    const phone = $("phone").value.trim();
-    const description = $("description").value.trim();
+  if(!title || !price || !author){ statusEl.textContent="Completa título, precio y tu nombre."; return; }
 
-    if (!title || !price || !author){ statusEl.textContent="Completa título, precio y tu nombre."; return; }
+  const fd=new FormData();
+  fd.append('room',room); fd.append('title',title); fd.append('price',price);
+  fd.append('author',author); fd.append('phone',phone); fd.append('description',description);
+  fd.append('user',me.id);
 
-    const fd = new FormData();
-    fd.append('room', room);
-    fd.append('title', title);
-    fd.append('price', price);
-    fd.append('author', author);
-    fd.append('phone', phone);
-    fd.append('description', description);
-    fd.append('user', me.id);
+  const firstImg=pendingFiles.find(f=>f.type.startsWith('image/'));
+  if(firstImg) fd.append('image', firstImg);
+  pendingFiles.forEach(f=>fd.append('media', f));
 
-    // portada opcional (primera imagen si hay)
-    const firstImg = pendingFiles.find(f=>f.type.startsWith('image/'));
-    if (firstImg) fd.append('image', firstImg);
+  try{
+    await pb.collection('posts').create(fd);
+    statusEl.textContent="Publicado.";
+    pendingFiles=[]; refreshChips(); e.target.reset();
+    if($("room").value !== roomDefault){ await loadRoom(room); }
+    document.querySelector('.tb-actions a[href="#feed"]').click();
+  }catch(err){ console.error(err); statusEl.textContent="Error al publicar."; }
+});
 
-    // campo múltiple 'media' (PocketBase: file multiple)
-    pendingFiles.forEach(f => fd.append('media', f));
-
-    try {
-      await pb.collection('posts').create(fd);
-      statusEl.textContent = "Publicado.";
-      pendingFiles = []; refreshChips();
-      e.target.reset();
-      if ($("room").value !== roomDefault){ await loadRoom(room); }
-    } catch (err){
-      console.error(err);
-      statusEl.textContent = "Error al publicar.";
-    }
-  });
-
-  /******** Inicio ********/
-  (async function start(){
-    await ensureGuest();
-    await loadRoom(roomDefault);
-  })();
+/* ========= START ========= */
+(async function start(){
+  await ensureGuest();
+  await loadRoom(roomDefault);
+})();
 </script>
 </body>
 </html>
