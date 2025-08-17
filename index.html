@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Baguet — Publicar & Listado (GitHub Pages)</title>
-<link rel="icon" href="logo-baguet.png" />
+<title>Baguet — Publicar & Listado</title>
 
-<!-- Si JS está activo, marcamos la raíz para aplicar estilos “con JS” -->
+<!-- Favicon y logo -->
+<link rel="icon" href="img/logo-baguet.png" />
+
+<!-- Marca <html> como con-JS para estilos seguros -->
 <script>document.documentElement.classList.add('js');</script>
 
 <style>
@@ -15,7 +17,10 @@
 
   .top{position:sticky;top:0;z-index:40;background:var(--nav);color:#e8f0ff;border-bottom:1px solid rgba(255,255,255,.08)}
   .topin{max-width:1100px;margin:auto;padding:10px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
-  .brand{display:flex;gap:10px;align-items:center}.brand img{width:36px;height:36px;border-radius:8px;background:#fff}
+  .brand{display:flex;gap:10px;align-items:center;text-decoration:none}
+  .brand .logo{width:40px;height:40px;border-radius:8px;object-fit:cover;display:block;background:#fff}
+  .brand .title b{color:#fff;font-size:16px;line-height:1}
+  .brand .title span{color:#c8d4ff;font-size:11px;letter-spacing:1px}
   .tabs{display:flex;gap:8px}
   .tab{appearance:none;border:1px solid rgba(255,255,255,.25);background:transparent;color:#e8f0ff;border-radius:10px;padding:9px 12px;font-weight:700;cursor:pointer}
   .tab.active,.tab:hover{border-color:#fff}
@@ -23,6 +28,7 @@
   .wrap{max-width:1100px;margin:20px auto;padding:0 16px}
   .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.06)}
   .body{padding:16px}
+
   .row{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media(max-width:820px){.row{grid-template-columns:1fr}}
   label{display:block;font-size:13px;color:#475569;margin:2px 0 6px}
   input,textarea{width:100%;padding:12px;border:1px solid #cfd5e1;border-radius:10px;background:#fff;font-size:14px}
@@ -32,6 +38,7 @@
   .btn{appearance:none;border:1px solid #cfd5e1;background:#fff;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
   .btn.primary{border:none;background:linear-gradient(180deg,var(--b1),var(--b2));color:#fff}
   .btn[disabled]{opacity:.6;cursor:not-allowed}
+
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media(max-width:900px){.grid2{grid-template-columns:1fr}}
   .box{border:1px dashed #cfd5e1;border-radius:12px;background:#fafcff;padding:12px}
 
@@ -48,6 +55,7 @@
   .toolbar{display:flex;gap:10px;align-items:center;margin:10px 0}
   .search{flex:1;padding:10px 12px;border:1px solid #cfd5e1;border-radius:10px}
   .badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;font-size:12px;font-weight:700;border-radius:999px;color:#033;background:#d5efe9;border:1px solid #b6e0d6}
+
   .grid{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))} @media(max-width:980px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}} @media(max-width:640px){.grid{grid-template-columns:1fr}}
   .cover{width:100%;height:200px;object-fit:cover;display:block;border-bottom:1px solid var(--border)}
   .strip{display:flex;gap:8px;overflow:auto;padding:8px;background:#fafafa;border-top:1px solid var(--border)}
@@ -56,9 +64,8 @@
   .row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
   .link{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid #c9cccf;background:#fff;text-decoration:none;color:#111;font-weight:700}
 
-  /* Vistas: por defecto visibles.
-     Solo si JS está activo (clase .js en <html>), ocultamos y mostramos la activa */
-  [data-view]{ /* visible si no hay JS */ }
+  /* Vistas seguras: visibles por defecto; con JS ocultamos la no activa */
+  [data-view]{display:block}
   .js [data-view]{display:none}
   .js [data-view].active{display:block}
 </style>
@@ -66,7 +73,11 @@
 <body>
 <header class="top">
   <div class="topin">
-    <a class="brand" href="#"><img src="logo-baguet.png" alt=""><b style="color:#fff">BAGUET</b></a>
+    <!-- LOGO + título -->
+    <a class="brand" href="#">
+      <img src="img/logo-baguet.png" alt="Baguet Loja" class="logo" width="40" height="40">
+      <div class="title"><b>BAGUET</b><br><span>LOJA</span></div>
+    </a>
     <div></div>
     <div class="tabs">
       <button class="tab active" data-goto="publicar">Publicar</button>
@@ -137,36 +148,25 @@
 </main>
 
 <script>
-/* ---------- util ---------- */
+/* ---------- util & navegación ---------- */
 const $=id=>document.getElementById(id);
-const esc=s=>(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-
-/* ---------- navegación segura (no deja todo oculto si falla) ---------- */
 function go(v){
   document.querySelectorAll('[data-view]').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  const view=document.querySelector(`[data-view="${v}"]`);
-  const tab=document.querySelector(`.tab[data-goto="${v}"]`);
-  if(view) view.classList.add('active');
-  if(tab) tab.classList.add('active');
+  document.querySelector(`[data-view="${v}"]`)?.classList.add('active');
+  document.querySelector(`.tab[data-goto="${v}"]`)?.classList.add('active');
   location.hash=v;
 }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>go(b.dataset.goto)));
 go(location.hash.replace('#','')||'publicar');
+const esc=s=>(s||'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-/* ---------- estado de adjuntos ---------- */
-let pending=[]; // {kind:'image'|'video', dataUrl, type, name}
-$('mediaInput').addEventListener('change', ()=>{
-  Array.from($('mediaInput').files||[]).forEach(addFile);
-  $('mediaInput').value='';
-});
-$('chips').addEventListener('click',e=>{
-  const b=e.target.closest('[data-x]'); if(!b) return;
-  pending.splice(+b.dataset.x,1); renderChips();
-});
-function renderChips(){
-  $('chips').innerHTML = pending.map((m,i)=>`<span class="chip">${m.kind==='image'?'🖼️':'🎥'} ${m.name||''} <button type="button" data-x="${i}">✕</button></span>`).join('');
-}
+/* ---------- adjuntos (fotos/videos) ---------- */
+let pending=[];
+$('mediaInput').addEventListener('change',()=>{ Array.from($('mediaInput').files||[]).forEach(addFile); $('mediaInput').value=''; });
+$('chips').addEventListener('click',e=>{ const b=e.target.closest('[data-x]'); if(!b) return; pending.splice(+b.dataset.x,1); renderChips(); });
+function renderChips(){ $('chips').innerHTML=pending.map((m,i)=>`<span class="chip">${m.kind==='image'?'🖼️':'🎥'} ${m.name||''} <button type="button" data-x="${i}">✕</button></span>`).join(''); }
+
 function addFile(f){
   if(f.type.startsWith('image/')){
     const r=new FileReader(); r.onload=e=>{
@@ -180,9 +180,8 @@ function addFile(f){
       }; img.src=e.target.result;
     }; r.readAsDataURL(f);
   }else if(f.type.startsWith('video/')){
-    const r=new FileReader(); r.onload=e=>{
-      pending.push({kind:'video', dataUrl:e.target.result, type:f.type, name:f.name||('video_'+Date.now()+'.webm')}); renderChips();
-    }; r.readAsDataURL(f);
+    const r=new FileReader(); r.onload=e=>{ pending.push({kind:'video', dataUrl:e.target.result, type:f.type, name:f.name||('video_'+Date.now()+'.webm')}); renderChips(); };
+    r.readAsDataURL(f);
   }
 }
 
@@ -202,23 +201,36 @@ enableBtn.addEventListener('click', startCam);
 switchBtn.addEventListener('click', async ()=>{ facing=(facing==='user')?'environment':'user'; await startCam(); });
 photoBtn.addEventListener('click', ()=>{
   if(!stream) return;
-  const s=stream.getVideoTracks()[0].getSettings();
-  const w=s.width||1280, h=s.height||720;
+  const s=stream.getVideoTracks()[0].getSettings(); const w=s.width||1280, h=s.height||720;
   const c=document.createElement('canvas'); c.width=w; c.height=h;
   c.getContext('2d').drawImage(live,0,0,w,h);
   const dataUrl=c.toDataURL('image/jpeg',0.9);
   pending.push({kind:'image', dataUrl, type:'image/jpeg', name:'foto_'+Date.now()+'.jpg'}); renderChips();
 });
+
+/* ----- grabación: VP8 preferido (más compatible) ----- */
+function chooseMime(){
+  const opts=[
+    'video/webm;codecs=vp8,opus',
+    'video/webm;codecs=vp9,opus',
+    'video/webm',
+    'video/mp4;codecs=h264,aac' // iOS puede necesitarlo, pero muchos Chrome no lo exponen
+  ];
+  for(const t of opts){ if(window.MediaRecorder?.isTypeSupported?.(t)) return t; }
+  return '';
+}
 recBtn.addEventListener('click', ()=>{
   if(!stream) return;
   chunks=[];
-  let mr; try{ mr=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9,opus'}) }catch{ mr=new MediaRecorder(stream) }
-  recorder=mr;
-  recorder.ondataavailable=e=>{ if(e.data.size>0) chunks.push(e.data); };
+  const mime=chooseMime();
+  recorder = mime ? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream);
+  recorder.ondataavailable=e=>{ if(e.data?.size) chunks.push(e.data); };
   recorder.onstop=()=>{
-    const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});
-    const fr=new FileReader(); fr.onload=()=>{ pending.push({kind:'video', dataUrl:fr.result, type:blob.type, name:'video_'+Date.now()+'.webm'}); renderChips(); };
-    fr.readAsDataURL(blob);
+    const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'}); const type=blob.type||'video/webm';
+    const fr=new FileReader(); fr.onload=()=>{
+      const ext = type.includes('mp4') ? '.mp4' : '.webm';
+      pending.push({kind:'video', dataUrl:fr.result, type, name:'video_'+Date.now()+ext}); renderChips();
+    }; fr.readAsDataURL(blob);
     clearInterval(timer); recHint.textContent='–';
   };
   recorder.start(); t0=Date.now();
@@ -260,8 +272,11 @@ function clearAllDB(){
   });
 }
 
-/* ---------- listado ---------- */
-function isVideo(m){ return m && m.kind==='video'; }
+/* ---------- render listado ---------- */
+function videoTag(m){
+  const t = m.type || (m.dataUrl.match(/^data:(.+?);/)||[])[1] || 'video/webm';
+  return `<video controls preload="metadata" playsinline src="${m.dataUrl}" type="${t}"></video>`;
+}
 async function renderList(room){
   const list=await getAll();
   const feed=$('feed'), count=$('count'), term=($('q')?.value||'').toLowerCase().trim();
@@ -269,12 +284,9 @@ async function renderList(room){
     .filter(p=>(p.room||'loja')===(room||'loja'))
     .filter(p=>!term || (p.title||'').toLowerCase().includes(term) || (p.author||'').toLowerCase().includes(term))
     .sort((a,b)=>new Date(b.created)-new Date(a.created));
-
   feed.innerHTML = rows.map(p=>{
     const strip = Array.isArray(p.media)&&p.media.length
-      ? `<div class="strip">${p.media.map(m=> isVideo(m)
-          ? `<video src="${m.dataUrl}" controls playsinline></video>`
-          : `<img src="${m.dataUrl}" alt="">`).join('')}</div>` : '';
+      ? `<div class="strip">${p.media.map(m=> m.kind==='video' ? videoTag(m) : `<img src="${m.dataUrl}" alt="">`).join('')}</div>` : '';
     const tel=(p.phone||'').replace(/[^0-9+]/g,'');
     return `
       <article class="card">
@@ -305,7 +317,6 @@ $('postForm').addEventListener('submit', async (e)=>{
   const author=($('author').value||'Anónimo').trim();
   const phone=($('phone').value||'').trim();
   const description=($('description').value||'').trim();
-
   if(!title || !price || !author){ $('status').textContent='Completa título, precio y tu nombre.'; return; }
 
   const img=pending.find(m=>m.kind==='image');
@@ -326,30 +337,23 @@ $('postForm').addEventListener('submit', async (e)=>{
   }
 });
 
-/* ---------- limpiar todo ---------- */
+/* ---------- limpiar ---------- */
 $('clearAll').addEventListener('click', async ()=>{
   if(!confirm('Esto borrará todas tus publicaciones locales.')) return;
   await clearAllDB(); await renderList($('room').value||'loja');
 });
 
-/* ---------- inicio seguro ---------- */
+/* ---------- inicio ---------- */
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{
-    $('btnPublish').disabled = true;        // no permitir publicar hasta que abra DB
-    await openDB();                         // abre BD
+    $('btnPublish').disabled = true;
+    await openDB();               // abrir BD
     $('btnPublish').disabled = false;
 
-    const sala = (location.search.match(/sala=([^&#]+)/)||[])[1]
-                  ? decodeURIComponent((location.search.match(/sala=([^&#]+)/)||[])[1]) : 'loja';
-    $('room').value = sala;
+    const sala=(location.search.match(/sala=([^&#]+)/)||[])[1]
+                ? decodeURIComponent((location.search.match(/sala=([^&#]+)/)||[])[1]) : 'loja';
+    $('room').value=sala;
 
     await renderList(sala);
     $('q').addEventListener('input', ()=>renderList($('room').value||'loja'));
   }catch(e){
-    console.error(e);
-    $('status').textContent='Error inicializando la base local.';
-  }
-});
-</script>
-</body>
-</html>
