@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Baguet Loja — Red social local</title>
-<meta name="description" content="Baguet: publica y vende productos locales; salas compartidas por enlace y presencia en vivo.">
+<title>Baguet — Red social local</title>
+<meta name="description" content="Baguet: publicaciones en tiempo real por sala (link compartido), con likes y comentarios.">
 <style>
   :root{
-    --nav-bg:#0c1320; --brand-1:#6d28d9; --brand-2:#2563eb; --accent:#10b981;
+    --nav:#0c1320; --brand1:#2563eb; --brand2:#6d28d9; --accent:#10b981;
     --ink:#0f1720; --muted:#6b7280; --bg:#f5f7fb; --surface:#fff; --radius:14px;
     --shadow:0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:var(--ink);background:var(--bg)}
+
   /* NAV */
-  .nav{position:sticky;top:0;z-index:40;background:var(--nav-bg);color:#e5eef7;border-bottom:1px solid rgba(255,255,255,.06)}
+  .nav{position:sticky;top:0;z-index:40;background:var(--nav);color:#e5eef7;border-bottom:1px solid rgba(255,255,255,.06)}
   .nav-inner{max-width:1120px;margin:auto;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
   .brand{display:flex;gap:10px;align-items:center}
   .brand img{width:36px;height:36px;border-radius:8px;object-fit:cover;background:#fff}
@@ -23,46 +24,59 @@
   .btn{appearance:none;border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer}
   .btn-ghost{background:transparent;color:#e5eef7;border:1px solid rgba(255,255,255,.2)}
   .btn-ghost:hover{border-color:#fff}
-  .btn-primary{background:linear-gradient(180deg,var(--brand-2),var(--brand-1));color:#fff;box-shadow:var(--shadow)}
-  /* LAYOUT */
+  .btn-primary{background:linear-gradient(180deg,var(--brand1),var(--brand2));color:#fff;box-shadow:var(--shadow)}
+  .btn-danger{background:#ef4444;color:#fff}
+
   .container{max-width:1120px;margin:26px auto;padding:0 16px}
   .surface{background:#fff;border:1px solid #e8ebf3;border-radius:var(--radius);box-shadow:var(--shadow)}
   h1,h2{margin:0 0 12px}
-  /* PRESENCIA */
-  .room-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
-  .room-id{font-size:14px;color:#334155}
+
+  /* BANNER / PRESENCIA */
+  .banner{margin:12px 0;padding:10px 12px;border-radius:10px;background:#fff3cd;border:1px solid #ffe08a;color:#553c00}
+  .room-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:10px 0 14px}
   .presence{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{padding:4px 10px;border-radius:999px;background:#eef5ff;border:1px solid #d7e7ff;color:#334155;font-size:12px;font-weight:700}
   .avatar{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
   .avatar[data-me="1"]{outline:2px solid var(--accent)}
-  .pill{padding:4px 10px;border-radius:999px;background:#eef5ff;border:1px solid #d7e7ff;color:#334155;font-size:12px;font-weight:700}
-  /* FORM */
+
+  /* FORM PUBLICAR */
   form.surface{padding:18px;margin-bottom:18px}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   @media (max-width:720px){.grid-2{grid-template-columns:1fr}}
   label{display:block;font-size:13px;color:#475569;margin:2px 0 6px}
   input[type="text"],input[type="number"],input[type="tel"],textarea{
-    width:100%;padding:12px;border:1px solid #cfd5e1;border-radius:10px;font-size:14px;background:#fff
-  }
+    width:100%;padding:12px;border:1px solid #cfd5e1;border-radius:10px;font-size:14px;background:#fff}
   input:focus,textarea:focus{outline:none;border-color:#9ac5ff;box-shadow:0 0 0 3px rgba(37,99,235,.16)}
   textarea{resize:vertical;min-height:84px}
   .file-row{display:grid;grid-template-columns:1fr 180px;gap:14px;align-items:center}
   @media (max-width:720px){.file-row{grid-template-columns:1fr}}
   .preview{width:100%;height:170px;border:1px dashed #cfd5e1;border-radius:10px;background:#f8fafc;display:flex;align-items:center;justify-content:center;color:#6b7280;font-size:12px;overflow:hidden}
   .preview img{width:100%;height:100%;object-fit:cover;display:none}
+
+  /* BUSCADOR / FILTROS */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+  .filters input{padding:10px;border:1px solid #cfd5e1;border-radius:10px}
+
   /* FEED */
-  .list-header{display:flex;align-items:center;gap:8px;margin:22px 0 12px}
+  .list-header{display:flex;align-items:center;gap:8px;margin:22px 0 8px}
   .badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;font-size:12px;font-weight:700;border-radius:999px;color:#033;background:#d5efe9;border:1px solid #b6e0d6}
   .grid-cards{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
   @media (max-width:980px){.grid-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
   @media (max-width:640px){.grid-cards{grid-template-columns:1fr}}
   .card{background:#fff;border:1px solid #e8ebf3;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-  .card img{width:100%;height:180px;object-fit:cover;display:block}
+  .card img{width:100%;height:190px;object-fit:cover;display:block}
   .card .body{padding:14px}
   .card h3{margin:0 0 6px 0;font-size:16px}
   .muted{color:var(--muted);font-size:13px}
   .price{font-weight:800;margin:6px 0}
-  .cta{display:flex;gap:8px;margin-top:10px}
+  .row-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .link{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid #c9cccf;background:#fff;text-decoration:none;color:#111;font-weight:700;font-size:13px}
+  .btn-like{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid #c9cccf;background:#fff;cursor:pointer}
+  .btn-like.liked{border-color:#99c9ff;background:#eef5ff}
+  .btn-small{padding:6px 10px;border:1px solid #c9cccf;background:#fff;border-radius:10px;cursor:pointer}
+  .comments{border-top:1px solid #eef0f4;margin-top:10px;padding-top:10px}
+  .comment{padding:8px 10px;border:1px solid #eef0f4;border-radius:10px;margin:6px 0;background:#fafbff}
+  .comment small{color:#64748b}
 </style>
 </head>
 <body>
@@ -71,8 +85,7 @@
 <div class="nav">
   <div class="nav-inner">
     <div class="brand">
-      <img src="logo-baguet.png" alt="Baguet Loja">
-      <div><b>BAGUET</b><span>LOJA</span></div>
+      <img src="logo-baguet.png" alt="Baguet"><div><b>BAGUET</b><span>LOJA</span></div>
     </div>
     <div></div>
     <div>
@@ -83,43 +96,46 @@
 </div>
 
 <main class="container">
+  <!-- Aviso modo local -->
+  <div id="localBanner" class="banner" style="display:none">Modo local: solo tú ves estas publicaciones. Para que todos las vean, pega tu configuración de Firebase (Realtime Database + Auth anónimo).</div>
+
   <!-- Sala / Presencia -->
   <div class="room-bar">
-    <div class="room-id">Sala: <strong id="roomName">—</strong> · <span class="pill" id="onlineCount">0 en línea</span></div>
+    <div>Sala: <strong id="roomName">—</strong> · <span class="pill" id="onlineCount">0 en línea</span></div>
     <div class="presence" id="presence"></div>
   </div>
 
   <!-- Form publicar -->
-  <form id="productForm" class="surface" autocomplete="off">
+  <form id="postForm" class="surface" autocomplete="off">
     <div class="grid-2">
       <div>
-        <label>Nombre del producto</label>
-        <input id="nombreProducto" type="text" required placeholder="Ej. Pan artesanal" />
+        <label>Título / producto</label>
+        <input id="titulo" type="text" required placeholder="Ej. Pan artesanal" />
       </div>
       <div>
         <label>Precio (USD)</label>
-        <input id="precioProducto" type="number" step="0.01" min="0" required placeholder="Ej. 1.50" />
+        <input id="precio" type="number" step="0.01" min="0" required placeholder="1.50" />
       </div>
       <div>
-        <label>Tu nombre (se mostrará en la sala)</label>
-        <input id="nombreVendedor" type="text" required placeholder="Tu nombre" />
+        <label>Tu nombre</label>
+        <input id="autor" type="text" required placeholder="Tu nombre" />
       </div>
       <div>
-        <label>Teléfono (WhatsApp)</label>
+        <label>WhatsApp</label>
         <input id="telefono" type="tel" placeholder="+593..." />
       </div>
     </div>
 
     <div style="margin-top:10px">
       <label>Descripción</label>
-      <textarea id="descripcionProducto" rows="3" placeholder="Horario, punto de entrega, si aceptas trueque, etc."></textarea>
+      <textarea id="descripcion" rows="3" placeholder="Detalles, punto de entrega, etc."></textarea>
     </div>
 
     <div class="file-row" style="margin-top:10px">
       <div>
         <label>Imagen (opcional)</label>
         <input id="imagen" type="file" accept="image/*" />
-        <div class="muted" style="margin-top:6px">Se comparte en la sala (comprimida para ahorrar datos).</div>
+        <div class="muted" style="margin-top:6px">Se comparte (comprimida) para ahorrar datos.</div>
       </div>
       <div class="preview" id="previewBox">
         <span>Vista previa</span>
@@ -133,12 +149,20 @@
     </div>
   </form>
 
+  <!-- Buscador / Filtros -->
+  <div class="filters surface" style="padding:10px">
+    <input id="q" type="text" placeholder="Buscar por título o autor…" />
+    <input id="min" type="number" step="0.01" placeholder="Precio mín." style="max-width:140px" />
+    <input id="max" type="number" step="0.01" placeholder="Precio máx." style="max-width:140px" />
+    <button id="clearFilters" class="btn-small">Limpiar</button>
+  </div>
+
   <!-- Feed -->
   <div class="list-header">
-    <h2 id="listado" style="margin:0">Publicaciones de la sala</h2>
+    <h2 style="margin:0">Publicaciones</h2>
     <span class="badge" id="count">0</span>
   </div>
-  <section id="productos" class="grid-cards"></section>
+  <section id="feed" class="grid-cards"></section>
 </main>
 
 <!-- Firebase SDKs -->
@@ -147,7 +171,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-  /* ====== CONFIGURA TU FIREBASE AQUÍ ====== */
+  /******** 1) PEGA TU CONFIG AQUÍ (Firebase Console → Project Settings → Web app) ********/
   const FIREBASE_CONFIG = {
     apiKey: "PASTE_API_KEY",
     authDomain: "PASTE_AUTH_DOMAIN",
@@ -157,187 +181,338 @@
     messagingSenderId: "PASTE_SENDER_ID",
     appId: "PASTE_APP_ID"
   };
-  const USE_FIREBASE = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "PASTE_API_KEY";
+  const FIREBASE_ON = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "PASTE_API_KEY";
 
-  // Sala desde ?sala=xxx (por defecto 'publico')
+  /******** Sala por enlace ********/
   const params = new URLSearchParams(location.search);
-  const roomId = params.get('sala') || 'publico';
-  document.getElementById('roomName').textContent = roomId;
-
-  // Nombre guardado
-  const nameInput = document.getElementById('nombreVendedor');
-  const savedName = localStorage.getItem('baguet_name') || '';
-  if (savedName) nameInput.value = savedName;
-  nameInput.addEventListener('input', ()=> localStorage.setItem('baguet_name', nameInput.value.trim()));
-
-  // Copiar link de sala
-  document.getElementById('copyLinkBtn').addEventListener('click', async ()=>{
-    const link = location.origin + location.pathname + '?sala=' + encodeURIComponent(roomId);
+  const roomId = params.get("sala") || "global";
+  document.getElementById("roomName").textContent = roomId;
+  document.getElementById("copyLinkBtn").onclick = async () => {
+    const link = location.origin + location.pathname + "?sala=" + encodeURIComponent(roomId);
     await navigator.clipboard.writeText(link);
-    alert('Link copiado: ' + link);
-  });
+    alert("Link copiado: " + link);
+  };
 
-  // Estado local (para funcionar offline también)
-  const LS_KEY = "baguet_social_" + roomId;
-  const form = document.getElementById("productForm");
-  const statusEl = document.getElementById("status");
-  const grid = document.getElementById("productos");
-  const countEl = document.getElementById("count");
-  const fileInput = document.getElementById("imagen");
-  const previewBox = document.getElementById("previewBox");
-  const previewImg = document.getElementById("previewImg");
-  const presenceBox = document.getElementById("presence");
-  const onlineCount = document.getElementById("onlineCount");
+  /******** Helpers ********/
+  const $ = (id) => document.getElementById(id);
+  const banner = $("localBanner");
+  const feed = $("feed");
+  const countEl = $("count");
+  const presenceBox = $("presence");
+  const onlineCount = $("onlineCount");
+  const nameInput = $("autor");
+  const savedName = localStorage.getItem("baguet_name") || "";
+  if (savedName) nameInput.value = savedName;
+  nameInput.addEventListener("input", () => localStorage.setItem("baguet_name", nameInput.value.trim()));
+  const LS_KEY = "baguet_room_" + roomId;
+
+  function esc(s){ return (s||"").replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+  function avatarColor(seed){ let h=0; for(let i=0;i<seed.length;i++) h=(h*31+seed.charCodeAt(i))%360; return `hsl(${h} 70% 45%)`; }
+
+  /******** Imagen: vista previa + compresión ********/
+  const fileInput = $("imagen"), previewBox = $("previewBox"), previewImg = $("previewImg");
   let imageDataURL = "";
-
-  function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch{ return []; } }
-  function saveLocal(item){ const data=loadLocal(); data.unshift(item); localStorage.setItem(LS_KEY, JSON.stringify(data)); return data; }
-
-  function avatarColor(seed){ let h=0; for (let i=0;i<seed.length;i++) h=(h*31 + seed.charCodeAt(i))%360; return `hsl(${h} 70% 45%)`; }
-
-  function renderPresence(list, meName){
-    presenceBox.innerHTML = "";
-    const arr = list && list.length ? list : (meName ? [{name:meName}] : []);
-    arr.forEach(u=>{
-      const av=document.createElement('div');
-      av.className='avatar';
-      av.textContent=(u.name||'¿?').trim().charAt(0).toUpperCase();
-      av.title=u.name||'Anónimo';
-      av.style.background=avatarColor(u.name||'x');
-      if (u.isMe) av.dataset.me="1";
-      presenceBox.appendChild(av);
-    });
-    onlineCount.textContent = `${arr.length} en línea`;
-  }
-
-  function render(list){
-    grid.innerHTML=""; countEl.textContent=list.length;
-    list.forEach(p=>{
-      const tel=(p.telefono||"").replace(/[^0-9+]/g,'');
-      const wsp= tel ? `https://wa.me/${tel}?text=${encodeURIComponent("Hola, me interesa tu producto: "+p.producto)}` : null;
-      const el=document.createElement("article");
-      el.className="card";
-      el.innerHTML = `
-        ${p.image ? `<img src="${p.image}" alt="${p.producto}">` : ""}
-        <div class="body">
-          <h3>${p.producto}</h3>
-          <div class="muted">Publicado por: ${p.vendedor || "Anónimo"}</div>
-          <div class="price">$${Number(p.precio).toFixed(2)}</div>
-          ${p.descripcion ? `<p class="muted" style="margin:6px 0 0">${p.descripcion}</p>` : ""}
-          <div class="cta">
-            ${wsp ? `<a class="link" target="_blank" href="${wsp}">WhatsApp</a>` : ""}
-            ${tel ? `<a class="link" href="tel:${tel}">Llamar</a>` : ""}
-          </div>
-        </div>`;
-      grid.appendChild(el);
-    });
-  }
-
-  // Carga inicial local
-  render(loadLocal());
-  renderPresence([], nameInput.value.trim() || "Invitado");
-
-  // Vista previa + compresión simple
   fileInput.addEventListener("change", ()=>{
-    const file=fileInput.files?.[0];
-    if(!file){ imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display=""; return; }
+    const f=fileInput.files?.[0];
+    if(!f){ imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display=""; return; }
     const reader=new FileReader();
     reader.onload=e=>{
       const img=new Image();
       img.onload=()=>{
-        const maxW=1000, q=0.8;
+        const maxW=1200, q=0.8;
         const s=Math.min(1, maxW/img.width);
         const w=Math.round(img.width*s), h=Math.round(img.height*s);
-        const canvas=document.createElement('canvas');
-        canvas.width=w; canvas.height=h;
+        const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h;
         const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,w,h);
         imageDataURL=canvas.toDataURL('image/jpeg', q);
         previewImg.src=imageDataURL; previewImg.style.display="block"; previewBox.firstElementChild.style.display="none";
       };
       img.src=e.target.result;
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(f);
   });
 
-  // ======== Firebase en tiempo real (social) ========
-  let db=null, auth=null, uid=null, myPresenceRef=null;
-  if (USE_FIREBASE) {
+  /******** Estado local (fallback sin Firebase) ********/
+  function loadLocal(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch{ return []; } }
+  function saveLocal(p){ const a=loadLocal(); a.unshift(p); localStorage.setItem(LS_KEY, JSON.stringify(a)); return a; }
+
+  /******** Render presencia ********/
+  function renderPresence(list, meName){
+    presenceBox.innerHTML="";
+    const arr=list && list.length? list : [{name:meName,isMe:true}];
+    arr.forEach(u=>{
+      const el=document.createElement("div");
+      el.className="avatar"; el.textContent=(u.name||"?").charAt(0).toUpperCase();
+      el.title=u.name||"Anónimo"; el.style.background=avatarColor(u.name||"x");
+      if(u.isMe) el.dataset.me="1";
+      presenceBox.appendChild(el);
+    });
+    onlineCount.textContent = `${arr.length} en línea`;
+  }
+
+  /******** Feed / búsquedas ********/
+  const postsCache = []; // {id, titulo, precio, autor, telefono, descripcion, image, likesCount, ts, ownerUid}
+  const likesMine = new Set(); // ids que yo likeé
+  const q = $("q"), min = $("min"), max = $("max");
+  $("clearFilters").onclick = ()=>{ q.value=""; min.value=""; max.value=""; applyFiltersAndRender(); };
+
+  function applyFiltersAndRender(){
+    const t = q.value.trim().toLowerCase();
+    const lo = parseFloat(min.value || ""); const hi = parseFloat(max.value || "");
+    const list = postsCache.filter(p=>{
+      const okT = !t || p.titulo.toLowerCase().includes(t) || (p.autor||"").toLowerCase().includes(t);
+      const pr = parseFloat(p.precio || "0");
+      const okMin = isNaN(lo) ? true : pr >= lo;
+      const okMax = isNaN(hi) ? true : pr <= hi;
+      return okT && okMin && okMax;
+    }).sort((a,b)=> (b.ts||0)-(a.ts||0));
+    render(list);
+  }
+
+  function render(list){
+    feed.innerHTML="";
+    list.forEach(p=>{
+      const card=document.createElement("article");
+      card.className="card"; card.id=`post-${p.id}`;
+      if (p.image){
+        const img=document.createElement("img"); img.src=p.image; img.alt=p.titulo; card.appendChild(img);
+      }
+      const body=document.createElement("div"); body.className="body";
+      const h3=document.createElement("h3"); h3.textContent=p.titulo; body.appendChild(h3);
+      const meta=document.createElement("div"); meta.className="muted";
+      meta.textContent=`Por ${p.autor||"Anónimo"} • ${new Date(p.ts).toLocaleString()}`;
+      body.appendChild(meta);
+      const price=document.createElement("div"); price.className="price"; price.textContent=`$${Number(p.precio||0).toFixed(2)}`;
+      body.appendChild(price);
+      if (p.descripcion){
+        const d=document.createElement("p"); d.className="muted"; d.style.margin="6px 0 0"; d.textContent=p.descripcion; body.appendChild(d);
+      }
+      // acciones
+      const actions=document.createElement("div"); actions.className="row-actions";
+      // like
+      const likeBtn=document.createElement("button");
+      likeBtn.className = "btn-like" + (likesMine.has(p.id) ? " liked" : "");
+      likeBtn.setAttribute("data-like", p.id);
+      likeBtn.innerHTML = `❤️ <span data-likecount="${p.id}">${p.likesCount||0}</span>`;
+      actions.appendChild(likeBtn);
+      // whatsapp / llamada
+      const tel=(p.telefono||"").replace(/[^0-9+]/g,'');
+      if (tel){
+        const a1=document.createElement("a"); a1.className="link"; a1.target="_blank";
+        a1.href=`https://wa.me/${tel}?text=${encodeURIComponent("Hola, me interesa: "+p.titulo)}`; a1.textContent="WhatsApp";
+        actions.appendChild(a1);
+        const a2=document.createElement("a"); a2.className="link"; a2.href=`tel:${tel}`; a2.textContent="Llamar";
+        actions.appendChild(a2);
+      }
+      // comentarios
+      const cBtn=document.createElement("button"); cBtn.className="btn-small"; cBtn.textContent="Comentarios";
+      cBtn.setAttribute("data-comments-toggle", p.id);
+      actions.appendChild(cBtn);
+      // borrar (solo dueño)
+      if (window._uid && p.ownerUid === window._uid){
+        const del=document.createElement("button"); del.className="btn-small btn-danger"; del.textContent="Eliminar";
+        del.setAttribute("data-del", p.id); actions.appendChild(del);
+      }
+
+      body.appendChild(actions);
+
+      // contenedor comentarios (lazy)
+      const cWrap=document.createElement("div"); cWrap.className="comments"; cWrap.id=`comments-${p.id}`; cWrap.style.display="none";
+      cWrap.innerHTML = `
+        <div id="comments-list-${p.id}"></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <input type="text" id="comment-input-${p.id}" placeholder="Escribe un comentario..." style="flex:1;padding:10px;border:1px solid #cfd5e1;border-radius:10px">
+          <button class="btn-small" data-send="${p.id}">Enviar</button>
+        </div>`;
+      body.appendChild(cWrap);
+
+      card.appendChild(body);
+      feed.appendChild(card);
+    });
+    countEl.textContent = list.length;
+  }
+
+  // Delegación de eventos en el feed (likes, toggle comentarios, enviar comentario, borrar)
+  const commentSubs = new Map(); // postId -> unsubscribe
+  feed.addEventListener("click", (ev)=>{
+    const likeBtn = ev.target.closest("[data-like]");
+    if (likeBtn){
+      const postId = likeBtn.getAttribute("data-like");
+      if (!window._db || !window._uid){ alert("En modo local los 'me gusta' no se sincronizan."); return; }
+      const likeUserRef = window._db.ref(`rooms/${roomId}/likesUser/${window._uid}/${postId}`);
+      likeUserRef.once("value").then(snap=>{
+        const liked = !!snap.val();
+        const countRef = window._db.ref(`rooms/${roomId}/posts/${postId}/likesCount`);
+        countRef.transaction(n => (liked ? Math.max(0, Number(n||0)-1) : Number(n||0)+1));
+        liked ? likeUserRef.remove() : likeUserRef.set(true);
+      });
+      return;
+    }
+
+    const tog = ev.target.closest("[data-comments-toggle]");
+    if (tog){
+      const postId = tog.getAttribute("data-comments-toggle");
+      const box = $("comments-"+postId);
+      const listEl = $("comments-list-"+postId);
+      if (box.style.display === "none"){
+        box.style.display = "block";
+        if (window._db && !commentSubs.has(postId)){
+          const ref = window._db.ref(`rooms/${roomId}/comments/${postId}`).limitToLast(100);
+          const handler = ref.on("child_added", s=>{
+            const c = s.val(); const item=document.createElement("div");
+            item.className="comment";
+            item.innerHTML = `<div><strong>${esc(c.name||"Anónimo")}</strong> <small>${new Date(c.ts).toLocaleString()}</small></div>
+                              <div>${esc(c.text||"")}</div>`;
+            listEl.prepend(item);
+          });
+          commentSubs.set(postId, ()=> ref.off("child_added", handler));
+        }
+      } else {
+        box.style.display = "none";
+      }
+      return;
+    }
+
+    const send = ev.target.closest("[data-send]");
+    if (send){
+      const postId = send.getAttribute("data-send");
+      const inp = $("comment-input-"+postId);
+      const txt = inp.value.trim();
+      if (!txt) return;
+      if (!window._db || !window._uid){ alert("En modo local los comentarios no se sincronizan."); return; }
+      const name = (nameInput.value.trim() || "Anónimo");
+      window._db.ref(`rooms/${roomId}/comments/${postId}`).push({
+        uid: window._uid, name, text: txt, ts: Date.now()
+      });
+      inp.value=""; return;
+    }
+
+    const del = ev.target.closest("[data-del]");
+    if (del){
+      const postId = del.getAttribute("data-del");
+      if (!window._db || !window._uid){ alert("Eliminación remota requiere Firebase."); return; }
+      if (!confirm("¿Eliminar tu publicación?")) return;
+      window._db.ref(`rooms/${roomId}/posts/${postId}`).remove();
+      // Nota: podrías también borrar comments/${postId} si quieres limpiarlo del todo
+    }
+  });
+
+  // Búsqueda reactiva
+  ["input","change"].forEach(evName=>{
+    q.addEventListener(evName, applyFiltersAndRender);
+    min.addEventListener(evName, applyFiltersAndRender);
+    max.addEventListener(evName, applyFiltersAndRender);
+  });
+
+  /******** Publicar ********/
+  const postForm = $("postForm"); const statusEl = $("status");
+  let lastPostAt = 0; // rate limit simple
+  postForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    const now = Date.now();
+    if (now - lastPostAt < 5000){ statusEl.textContent = "Espera unos segundos para publicar de nuevo."; return; }
+    const pub = {
+      id: "local-"+now,
+      titulo: $("titulo").value.trim(),
+      precio: $("precio").value.trim(),
+      autor:  nameInput.value.trim() || "Anónimo",
+      telefono: $("telefono").value.trim(),
+      descripcion: $("descripcion").value.trim(),
+      image: imageDataURL,
+      likesCount: 0,
+      ts: now,
+      ownerUid: window._uid || "local"
+    };
+    if (!pub.titulo || !pub.precio || !pub.autor){ statusEl.textContent = "Completa título, precio y tu nombre."; return; }
+
+    // Local optimista
+    saveLocal(pub);
+    upsertCache(pub); applyFiltersAndRender();
+    statusEl.textContent = "Publicado.";
+    postForm.reset(); imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display="";
+    lastPostAt = now;
+
+    // Remoto (si hay Firebase)
+    if (window._db){
+      const newRef = window._db.ref(`rooms/${roomId}/posts`).push();
+      pub.id = newRef.key;
+      newRef.set(pub);
+    }
+  });
+
+  function upsertCache(p){
+    const idx = postsCache.findIndex(x => x.id === p.id);
+    if (idx >= 0) postsCache[idx] = p; else postsCache.unshift(p);
+  }
+
+  // Carga inicial local
+  loadLocal().forEach(upsertCache);
+  applyFiltersAndRender();
+
+  // Presencia local por defecto
+  renderPresence([], nameInput.value.trim() || "Invitado");
+  if (!FIREBASE_ON) banner.style.display = "block";
+
+  /******** 2) Inicializar Firebase (modo social real) ********/
+  if (FIREBASE_ON){
     firebase.initializeApp(FIREBASE_CONFIG);
-    auth = firebase.auth();
-    db = firebase.database();
+    const auth = firebase.auth();
+    const db = firebase.database();
+    window._db = db;
 
     auth.signInAnonymously().catch(console.error);
     auth.onAuthStateChanged(user=>{
       if (!user) return;
-      uid = user.uid;
+      window._uid = user.uid;
 
-      // PRESENCE
-      const meName = nameInput.value.trim() || "Invitado";
+      // PRESENCIA
       const presRef = db.ref(`rooms/${roomId}/presence`);
-      myPresenceRef = presRef.child(uid);
-      firebase.database().ref(".info/connected").on("value", snap=>{
+      const meRef = presRef.child(window._uid);
+      db.ref(".info/connected").on("value", snap=>{
         if (snap.val() === true) {
-          myPresenceRef.onDisconnect().remove();
-          myPresenceRef.set({ name: meName, ts: firebase.database.ServerValue.TIMESTAMP });
+          meRef.onDisconnect().remove();
+          meRef.set({ name: nameInput.value.trim() || "Anónimo", ts: firebase.database.ServerValue.TIMESTAMP });
         }
       });
-      // Update name live
-      nameInput.addEventListener('input', ()=>{
-        const nm = nameInput.value.trim() || "Invitado";
-        localStorage.setItem('baguet_name', nm);
-        if (myPresenceRef) myPresenceRef.set({ name:nm, ts: firebase.database.ServerValue.TIMESTAMP });
+      nameInput.addEventListener("input", ()=>{
+        meRef.set({ name: nameInput.value.trim() || "Anónimo", ts: firebase.database.ServerValue.TIMESTAMP });
       });
-
-      // Escuchar presencia
       presRef.on("value", snap=>{
         const val = snap.val() || {};
-        const arr = Object.keys(val).map(k => ({...val[k], isMe: k===uid}));
-        renderPresence(arr, meName);
+        const arr = Object.keys(val).map(k => ({...val[k], isMe: k===window._uid}));
+        renderPresence(arr, nameInput.value.trim() || "Anónimo");
       });
 
-      // FEED: escuchar últimos 200
+      // POSTS: escuchar últimos 200
       const postsRef = db.ref(`rooms/${roomId}/posts`).limitToLast(200);
-      const remote = [];
       postsRef.on("child_added", s=>{
-        const item=s.val(); remote.unshift(item);
-        // Combinar con local
-        const local = loadLocal();
-        const key = p => [p.producto,p.vendedor,p.precio,p.ts].join("|");
-        const map = new Map([...remote, ...local].map(x => [key(x), x]));
-        const arr = Array.from(map.values()).sort((a,b)=>b.ts-a.ts);
-        render(arr); countEl.textContent = arr.length;
+        const p = { id: s.key, ...s.val() };
+        upsertCache(p); applyFiltersAndRender();
+      });
+      postsRef.on("child_changed", s=>{
+        const p = { id: s.key, ...s.val() };
+        upsertCache(p); applyFiltersAndRender();
+      });
+      postsRef.on("child_removed", s=>{
+        const id = s.key;
+        const i = postsCache.findIndex(x => x.id === id);
+        if (i>=0) postsCache.splice(i,1);
+        applyFiltersAndRender();
+      });
+
+      // MIS LIKES
+      const likesUserRef = db.ref(`rooms/${roomId}/likesUser/${window._uid}`);
+      likesUserRef.on("value", snap=>{
+        likesMine.clear();
+        const v = snap.val() || {};
+        Object.keys(v).forEach(pid => likesMine.add(pid));
+        // repintar
+        document.querySelectorAll("[data-like]").forEach(btn=>{
+          const id = btn.getAttribute("data-like");
+          if (likesMine.has(id)) btn.classList.add("liked"); else btn.classList.remove("liked");
+        });
       });
     });
-  }
-
-  // Publicar (local + remoto)
-  form.addEventListener("submit",(e)=>{
-    e.preventDefault();
-    const pub={
-      producto:document.getElementById("nombreProducto").value.trim(),
-      precio:document.getElementById("precioProducto").value.trim(),
-      vendedor:nameInput.value.trim() || "Anónimo",
-      telefono:document.getElementById("telefono").value.trim(),
-      descripcion:document.getElementById("descripcionProducto").value.trim(),
-      image:imageDataURL,
-      ts: Date.now()
-    };
-    if(!pub.producto || !pub.precio || !pub.vendedor){
-      statusEl.textContent="Completa producto, precio y vendedor."; return;
-    }
-    // Local
-    const list=saveLocal(pub); render(list);
-    statusEl.textContent="Publicado.";
-
-    // Remoto
-    if (db){ db.ref(`rooms/${roomId}/posts`).push(pub); }
-
-    form.reset(); imageDataURL=""; previewImg.style.display="none"; previewBox.firstElementChild.style.display="";
-  });
-
-  // Mostrar cuántos hay aunque no uses Firebase (tu “yo” local)
-  if (!USE_FIREBASE) {
-    renderPresence([{name: nameInput.value.trim() || "Invitado", isMe:true}], nameInput.value.trim() || "Invitado");
   }
 </script>
 </body>
